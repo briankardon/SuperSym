@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Supersym</title>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css">
+	<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+  <script src='js/spectrum.js'></script>
+	<script src="js/main.js"></script>
+	<link href='https://fonts.googleapis.com/css?family=Raleway:400,300,600' rel='stylesheet' type='text/css'>
+	<link rel="stylesheet" href="css/normalize.css">
+  <link rel="stylesheet" href="css/skeleton.css">
+	<link rel='stylesheet' href='css/spectrum.css' />
+  <link rel="stylesheet" href="css/main.css">
+	<!-- Favicons generated using https://favicon.io/favicon-converter/ -->
+	<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+	<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+	<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+	<link rel="manifest" href="/site.webmanifest">
+</head>
+<body>
+	<div id="content">
+	<div class="toolBar" id="maintoolBar">
+
+		<fieldset class="toolBarElement">
+			<label for="" class="toolBarSubElementHeader">Clear</label>
+			<div><button id="clearDrawing" class="toolBarSubElement clearer" onclick="clearDrawing()">Drawing</button></div>
+			<div><button id="clearSymmetries" class="toolBarSubElement clearer" onclick="clearSymmetries()">Symmetries</button></div>
+		</fieldset>
+
+		<fieldset class="toolBarElement">
+			<label for="" class="toolBarSubElementHeader">Mode:</label>
+			<label for="draw">
+					<input type="radio" class="toolBarSubElement"  id="draw" name="Mode" value="draw" onclick="updateMode()" checked>
+					<span class="toolBarSubElement">Draw</span>
+			</label>
+
+			<!--<div class="radioInputWrapper">
+				 <label for="fill">
+					 <input type="radio" id="fill" name="Mode" value="fill" onclick="updateMode()">
+					 Fill
+				 </label>
+			</div>-->
+
+			<label for="editSymmetries">
+				<input type="radio" class="toolBarSubElement" id="editSymmetries" name="Mode" value="editSymmetries" onclick="updateMode()">
+				<span class="toolBarSubElement">Edit sym.</span>
+			</label>
+		</fieldset>
+
+		<fieldset class="toolBarElement">
+			<label for="" class="toolBarSubElementHeader">Symmetry type:</label>
+		  <label for="point">
+	      <input type="radio" class="toolBarSubElement" id="point" name="symmetryType" value="point" checked>
+	      <span  class="toolBarSubElement">Point</span>
+		  </label>
+
+		  <label for="rotation">
+	      <input type="radio" class="toolBarSubElement" id="rotation" name="symmetryType" value="rotation">
+	      <span class="toolBarSubElement">Rotation:</span>
+	  	  <input type="number" class="toolBarSubElement" id="rotNum" name="rotNum" step="1" min="2" max="64" value=7>
+		  </label>
+
+		  <label for="line">
+	      <input type="radio" class="toolBarSubElement" id="line" name="symmetryType" value="line">
+	      <span class="toolBarSubElement">Line</span>
+		  </label>
+
+		  <label for="translation">
+		    <input type="radio" class="toolBarSubElement" id="translation" name="symmetryType" value="translation">
+		    <span class="toolBarSubElement">Translation:</span>
+			  <input type="number" class="toolBarSubElement" id="transNum" name="transNum" step="1" min="1" max="64" value=5>
+		  </label>
+
+			<label for="scale">
+		    <input type="radio" class="toolBarSubElement" id="scale" name="symmetryType" value="scale">
+		    <span class="toolBarSubElement">Scale:</span>
+			  <input type="number" class="toolBarSubElement" id="scaleNum" name="scaleNum" step="1" min="1" max="10" value=5>
+		  </label>
+
+		</fieldset>
+
+		<fieldset class="toolBarElement">
+			<label for="" class="toolBarSubElementHeader">Iteration order</label>
+			<label for="symmetryLevel">
+				<span class="toolBarSubElement">Sym. iteration order:</span>
+		    <input type="number" class="toolBarSubElement" id="symmetryLevel" name="symmetryLevel" step="1" value=1 style="width: 80px">
+			</label>
+			<label for="symmetryLevelAutoIncrement">
+			    <input type="checkbox" class="toolBarSubElement" id="symmetryLevelAutoIncrement" name="symmetryLevelAutoIncrement" checked>
+			    <span class="toolBarSubElement">Auto increment</span>
+			</label>
+		</fieldset>
+
+		<!-- <input type="text" id="color"> -->
+
+		<fieldset class="toolBarElement">
+			<label for="" class="toolBarSubElementHeader">Saves</label>
+			<div>
+				<button class="toolBarSubElement" id="loadSymmetry" onclick="loadSavedSymmetryConfiguration()">Load sym.</button>
+			  <select class="toolBarSubElement" name="savedSymmetries" id="savedSymmetries" width="20">
+					<!-- <option class="toolBarSubElement" value="b" selected>a</option> -->
+			  </select>
+			</div>
+			<div>
+				<button class="toolBarSubElement" id="storeSymmetry" onclick="saveCurrentSymmetryConfiguration()">Store sym. as:</button>
+				<input class="toolBarSubElement" size="10" id="storeSymmetryName" type="text" value="mySym">
+			</div>
+			<button class="toolBarSubElement" id="exportSymmetry" onclick="exportCurrentSymmetriesToUser()">Export sym</button>
+			<button class="toolBarSubElement" id="importSymmetry" onclick="importSymmetriesFromUser()">Import sym</button>
+		</fieldset>
+
+		<fieldset class="toolBarElement">
+			<label for="" class="toolBarSubElementHeader">Transparency</label>
+	    <label for="symmetryTransparency">
+        <input type="range" class="toolBarSubElement" id="symmetryTransparency" name="symmetryTransparency" min="0" max="1" step="0.05">
+        <span class="toolBarSubElement">Sym.</span>
+	    </label>
+
+	    <label for="drawTransparency">
+        <input type="range" class="toolBarSubElement" id="drawTransparency" name="drawTransparency" min="0" max="1" step="0.05">
+        <span class="toolBarSubElement">Drawing</span>
+	    </label>
+		</fieldset>
+
+		<fieldset class="toolBarElement">
+		  <label for="" class="toolBarSubElementHeader">Color</label>
+			<label for="lineColor">
+	    	<input type="color" class="toolBarSubElement" id="lineColor" name="lineColor" value="#0000ff">
+				<span class="toolBarSubElement">Line</span>
+			</label>
+			<label for="backgroundColor">
+	    	<input type="color" class="toolBarSubElement" id="backgroundColor" name="backgroundColor" value="#ffffff" onchange="updateCanvas()">
+				<span class="toolBarSubElement">Background</span>
+			</label>
+			<!-- <label for="rainbow" class="toolBarSubElement">
+				<input type="checkbox" class="toolBarSubElement" id="rainbow" name="rainbow">
+				<span class="toolBarSubElement">Rainbow</span>
+			</label> -->
+		</fieldset>
+
+		<a class="toolBarElement" id="FAQLink" href="#">FAQ</a>
+
+	  <a class="icon toolBarElement" href="javascript:void(0);" onClick="openDrawerMenu()">&#9776;</a>
+	  <!--&#9776; is the code for the 3 line menu button-->
+	</div>
+
+
+<div class="main">
+<canvas id="drawCanvas" width="1200px", height="800px"></canvas>
+<!--<button id="toggleSymmetryVisibility" onclick="toggleSymmetryVisibility()">Toggle symmetry visibility</button>
+<button id="toggleDrawingVisibility" onclick="toggleDrawingVisibility()">Toggle drawing Visibility</button>
+-->
+</div>
+
+<div class="footer" id="footer">
+    SuperSym! Created by Brian Kardon (<a href="https://twitter.com/BrianKardon">@briankardon</a>) 2020. Version:
+</div>
+
+<!--Hidden content with which to populate the FAQ modal popup -->
+<div id="modal">
+	<div id="modal-content">
+		<span id="closeButton">&times;</span>
+		<h2>SuperSym</h2>
+		<h4>What is this?</h4>
+		<p>SuperSym is a toy for doodling with symmetry!</p>
+		<h4>How do I do it?</h4>
+		<p>However you want. Add some symmetries by clicking on "Edit sym.", choosing a symmetry type, then clicking on the canvas, then draw and see what happens! If you'd like to see a demo, <a href="https://youtu.be/k3F10Ch_YiI">click here</a></p>
+		<h4>Are there any shortcut keys?</h4>
+		<p>Sure are! Press "?" to see the list of shortcut keys.</p>
+		<h4>I found a cool symmetry configuration! How do I save it for later?</h4>
+		<p>Awesome. You can click "store symmetry as" to add it to the list of loadable presets, but that won't persist if you close or reload the page.</p>
+		<p>You an also click "export sym", copy the symmetry code, and save it on your computer in a text editor. Later, you can click "import sym" and paste the code back in to get your symmetry configuration back.</p>
+		<h4>How do I move symmetries around?</h4>
+		<p>On non-touch devices, click "Edit sym." to enter symmetry-editing mode, then shift-click on one of the control points for the symmetry you want to move. You can then click somewhere else to re-place the symmetry. Sorry, changing symmetries isn't supported on touch devices yet - for you just clear the symmetries and start over.</p>
+		<h4>How do I delete symmetries?</h4>
+		<p>On non-touch devices, click "Edit sym." to enter symmetry-editing mode, then shift-click on the symmetry you want to delete, then press "escape". Sorry, this isn't supported on touch devices yet - just clear the whole thing for now.</p>
+		<h4>What are the different types of symmetries?</h4>
+		<p>The best way to find out is to try them, but if you'd like a primer:</p>
+		<ul>
+			<li>A <strong>point symmetry</strong> keeps your drawing the same when reflected through a point. That means, if you take every point in your drawing and flip it over the chosen point, it will stay the same</li>
+			<li>A <strong>rotational symmetry</strong> makes your drawing stay the same when you rotate it. For example, a rotational symmetry of order 5 keeps your drawing the same when it is rotated one or more 1/5 turns (72 degrees).</li>
+			<li>A <strong>line symmetry</strong> keeps your drawing the same when flipped over a line</li>
+			<li>A <strong>translational symmetry</strong> keeps your drawing the same when moved by a particular amount in a particular direction. Ok, technically that would only be true if it translated it an infinite number of times. Instead, you can pick the "order" of the translation, which determins how many times your drawing is repeated.</li>
+			<li>A <strong>scale symmetry</strong> keeps your drawing the same when scaled up or down with respect to a point. You can pick the "order" of the scale, which determins how many times your drawing is scaled.</li>
+		</ul>
+		<h4>What does the "Symmetry iteration order" button do?</h4>
+		<p>The symmetry iteration order determines, for the next symmetry you place, the order in which your drawing is "symmetrized".</p>
+		<p>For example, if you have a point symmetry with iteration order 1, and a line symmetry with iteration order 2, then the point symmetry is first applied to the drawing, then the line symmetry is applied to the results of that. If instead, you had a point symmetry and a line symmetry BOTH with iteration order 1, then both symmetries are applied simultaneously, rather than in sequence. </p>
+		<p>Symmetry orders can be any integer, and they do not have to be consecutive. Symmetries are executed from smallest to largest iteration order, with equal-iteration-order symmetries executed simultaneously. You can do some complicated stuff by messing with the iteration orders of your symmetries. At the moment, there is no visual indication of the symmetry iteration order after you place them, so for now you'll just have to remember.</p>
+		<p>By default, symmetry order automatically increments for each symmetry you place, but this can be turned off by unchecking the "Automatically increment" checkbox.</p>
+		<h4>This thing starts to creak when I have 288 symmetries.</h4>
+		<p>Yep, sorry, the code is severely un-optimized. Hopefully some day I or someone can go back and rewrite it to be a bit more efficient.</p>
+		<h4>I have an idea!</h4>
+		<p>And I bet it's a good one. I'd love to hear your feedback at <a href="https://twitter.com/BrianKardon">@briankardon</a></p>
+	</div>
+</div>
+</div>
+<div id="splash">
+	<h1>SuperSym</h1>
+</div>
+<div id="exportDialog" hidden="hidden" title="Exported symmetry configuration"></div>
+<div id="shortcutKeyDialog" hidden="hidden" title="Shortcut keys">
+	<table>
+	  <tr>
+	    <th>Key</th>
+	    <th>Action</th>
+	  </tr>
+		<tr><td>c</td>			<td>Clear drawing</td></tr>
+		<tr><td>Shift-c</td><td>Clear symmetries</td></tr>
+		<tr><td>d</td>			<td>Switch to draw mode</td></tr>
+		<tr><td>e</td>			<td>Switch to edit sym. mode</td></tr>
+		<tr><td>p</td>			<td>Switch to point symmetry</td></tr>
+		<tr><td>r</td>			<td>Switch to rotation symmetry</td></tr>
+		<tr><td>l</td>			<td>Switch to line symmetry</td></tr>
+		<tr><td>t</td>			<td>Switch to translation symmetry</td></tr>
+		<tr><td>Ctrl-z or ⌘-z</td>	<td>Undo last drawing stroke</td></tr>
+		<tr><td>Shift</td>	<td>While in edit symmetry mode, hold down shift to see the effect of a symmetry before you place it.</td></tr>
+		<tr><td>Shift-click</td>	<td>While in draw mode, create a straight line from the last drawn point.</td></tr>
+		<tr><td>Ctrl-click or Opt-click</td>	<td>While in edit symmetry mode, pick up an existing symmetry to edit it.</td></tr>
+		<tr><td>Escape</td>	<td>When in edit sym. mode, delete symmetry you are currently editing</td></tr>
+		<tr><td>?</td>			<td>Open this dialog</td></tr>
+	</table>
+</div>
+
+</body>
+</html>
