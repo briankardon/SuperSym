@@ -692,7 +692,7 @@ function updateColorHistory() {
 	let backColor = getSelectedBackgroundColor();
 	let isLineColorNew = true;
 	let isBackColorNew = true;
-	let maxHistoryNum = -1;
+	let maxHistoryNum = 0;
 	let historyColors = $("#colorTools").find("button.colorHistory").map(function (k, button) {
 		return $(button).css('background-color');
 	}).get();
@@ -717,6 +717,7 @@ function updateColorHistory() {
 			return $(button).text();
 		}).get();
 		// let minHistoryNum = Math.min(...historyNums);
+		// Delete the oldest color to make room for new one
 		$("#colorTools").find("button.colorHistory:contains('1')").remove();
 		$("#colorTools").find("button.colorHistory").each(function(k, element) {
 			$(element).text(k);
@@ -1068,7 +1069,7 @@ $(function () {
 	$("#drawTransparency").on('change', updateCanvas)
 
 	// Set version number
-	$("#footer").html($('#footer').html()+'1.07')
+	$("#footer").html($('#footer').html()+'1.08')
 });
 
 function flatCoord(x, y, numPerPixel) {
