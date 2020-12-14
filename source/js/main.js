@@ -720,7 +720,7 @@ function updateColorHistory() {
 		// Delete the oldest color to make room for new one
 		$("#colorTools").find("button.colorHistory:contains('1')").remove();
 		$("#colorTools").find("button.colorHistory").each(function(k, element) {
-			$(element).text(k);
+			$(element).text(k+1);
 		});
 	}
 	// if (!historyColors.includes(backColor)) {
