@@ -61,6 +61,28 @@ $(document).keyup(function(e) {
 			// When shift key is released, we should recalculate symmetries in case we are no longer displaying result of temporary symmetries.
 			recalculateSymmetries(false);
 			break;
+		case '1':
+		case '2':
+		case '3':
+		case '4':
+		case '5':
+			colorHistoryClickHandler(e, e.key);
+			break;
+		case '!':
+			colorHistoryClickHandler(e, '1');
+			break;
+		case '@':
+			colorHistoryClickHandler(e, '2');
+			break;
+		case '#':
+			colorHistoryClickHandler(e, '3');
+			break;
+		case '$':
+			colorHistoryClickHandler(e, '4');
+			break;
+		case '%':
+			colorHistoryClickHandler(e, '5');
+			break;
 }
 });
 
@@ -145,6 +167,13 @@ function rgbToHsl(r, g, b) {
   return [h * 60, s, l];
 }
 
+function getContrastingRGBColor(rgb) {
+	// Takes a vector of three rgb color values,
+	// 	and returns a vector of three rgb color values
+	//	that provide good contrast with the original color.
+	return rgb.reduce((a, b) => a + b, 0)/(3*255) > 0.5 ? [0, 0, 0] : [255, 255, 255];
+}
+
 function hslToRgb(h, s, l) {
   let c = (1 - Math.abs(2 * l - 1)) * s;
   let hp = h / 60.0;
@@ -175,8 +204,13 @@ function componentToHex(c) {
     return hex.length == 1 ? "0" + hex : hex;
 }
 
-function rgbToHex(r, g, b) {
-    return "#" + componentToHex(r) + componentToHex(g) + componentToHex(b);
+function parseRGBString(rgb) {
+	// Parse string of form 'rgb(22, 33, 11)'
+	return rgb.match(/(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/).slice(1, 4).map((s) => parseInt(s));
+}
+
+function rgbToHex(rgb) {
+    return "#" + componentToHex(rgb[0]) + componentToHex(rgb[1]) + componentToHex(rgb[2]);
 }
 
 function hexToRgb(hex) {
@@ -385,6 +419,7 @@ var hoverSymmetryColor = 'red';
 var symmetries = initializeSymmetryList();
 sortSymmetries(symmetries);
 var scaleBaseRadius = 40;
+var maxColorHistorySize = 5;
 
 function initializeSymmetryList(otherSymmetries) {
 	// Basically just add an identity symmetry to the beginning.
@@ -652,6 +687,89 @@ function getSelectedBackgroundColor() {
 	return $("#backgroundColor").val();
 }
 
+function updateColorHistory() {
+	let lineColor = getSelectedLineColor();
+	let backColor = getSelectedBackgroundColor();
+	let isLineColorNew = true;
+	let isBackColorNew = true;
+	let maxHistoryNum = -1;
+	let historyColors = $("#colorTools").find("button.colorHistory").map(function (k, button) {
+		return $(button).css('background-color');
+	}).get();
+	let historyNums = $("#colorTools").find("button.colorHistory").map(function (k, button) {
+		return $(button).text();
+	}).get();
+
+	if (historyNums.length > 0) {
+		nextHistoryNum = Math.max(...historyNums) + 1;
+	} else {
+		nextHistoryNum = 1;
+	}
+
+	if (!historyColors.includes(lineColor)) {
+		// Line color is new - add it to history
+		addColorHistoryButton(lineColor, nextHistoryNum);
+		nextHistoryNum = nextHistoryNum + 1;
+	}
+	if ($("#colorTools").find("button.colorHistory").length > maxColorHistorySize) {
+		$("#colorTools").find("button.colorHistory")
+		historyNums = $("#colorTools").find("button.colorHistory").map(function (k, button) {
+			return $(button).text();
+		}).get();
+		// let minHistoryNum = Math.min(...historyNums);
+		$("#colorTools").find("button.colorHistory:contains('1')").remove();
+		$("#colorTools").find("button.colorHistory").each(function(k, element) {
+			$(element).text(k);
+		});
+	}
+	// if (!historyColors.includes(backColor)) {
+	// 	// Background color is new - add it to history
+	// 	addColorHistoryButton(backColor, nextHistoryNum);
+	// }
+}
+
+function addColorHistoryButton(color, num) {
+	let colorHistoryButton = $("<button/>", {
+		"text": num,
+		"class": "colorHistory",
+		"onclick": 'colorHistoryClickHandler(event, '+num+')',
+		"appendTo": $("#colorTools")
+	}).css({
+		"background-color": color,
+		"width": "30px",
+		"height": "30px",
+		"padding": "0px"
+	});
+	try {
+		rgbColor = parseRGBString($(colorHistoryButton).css('background-color'));
+		$(colorHistoryButton).attr('title', rgbColor);
+		let contrastRGB = getContrastingRGBColor(rgbColor);
+		$(colorHistoryButton).css('color', rgbToHex(contrastRGB));
+	} catch(err) {
+		console.log('Error - cannot create history buttons.')
+		$(colorHistoryButton).remove();
+	}
+}
+
+function colorHistoryClickHandler(event, colorHistoryNum) {
+	let colorHistoryButton = $("#colorTools").find("button.colorHistory:contains('"+colorHistoryNum+"')");
+	if (colorHistoryButton.length > 0) {
+		let color = rgbToHex(parseRGBString($(colorHistoryButton).css('background-color')));
+		if (event.shiftKey) {
+			$('#backgroundColor').val(color);
+		} else {
+			$('#lineColor').val(color);
+		}
+	}
+}
+
+function setLineColor(color) {
+	$('#lineColor').val(color);
+}
+function setBackgroundColor(color) {
+	$('#backgroundColor').val(color);
+}
+
 var lastMouseX, lastMouseY;
 
 function touchendHandler(evt) {
@@ -886,6 +1004,8 @@ $(function () {
 	// Set up modal
 	setUpModal();
 
+	updateColorHistory();
+
 	// Queue up predefined symmetry configurations in the dropdown menu
 	addPredefinedSymmetryConfigurations();
 
@@ -966,7 +1086,7 @@ function floodFill(x, y, color) {
 		pixelMap[xx] = [];
 		for (var yy = 0; yy < drawCanvas.height; yy++) {
 			zz = flatCoord(xx, yy);
-			pixelMap[xx][yy] = rgbToHex(imgData.data[zz], imgData.data[zz+1], imgData.data[zz+2]);
+			pixelMap[xx][yy] = rgbToHex([imgData.data[zz], imgData.data[zz+1], imgData.data[zz+2]]);
 		}
 	}
 	var oldColor = pixelMap[x][y];

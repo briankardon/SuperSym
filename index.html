@@ -123,14 +123,14 @@
 	    </label>
 		</fieldset>
 
-		<fieldset class="toolBarElement">
+		<fieldset id="colorTools" class="toolBarElement">
 		  <label for="" class="toolBarSubElementHeader">Color</label>
 			<label for="lineColor">
-	    	<input type="color" class="toolBarSubElement" id="lineColor" name="lineColor" value="#0000ff">
+	    	<input type="color" class="toolBarSubElement" id="lineColor" name="lineColor" value="#0000ff" onchange="updateColorHistory()">
 				<span class="toolBarSubElement">Line</span>
 			</label>
 			<label for="backgroundColor">
-	    	<input type="color" class="toolBarSubElement" id="backgroundColor" name="backgroundColor" value="#ffffff" onchange="updateCanvas()">
+	    	<input type="color" class="toolBarSubElement" id="backgroundColor" name="backgroundColor" value="#ffffff" onchange="updateColorHistory(); updateCanvas()">
 				<span class="toolBarSubElement">Background</span>
 			</label>
 			<!-- <label for="rainbow" class="toolBarSubElement">
@@ -219,6 +219,8 @@
 		<tr><td>Shift-click</td>	<td>While in draw mode, create a straight line from the last drawn point.</td></tr>
 		<tr><td>Ctrl-click or Opt-click</td>	<td>While in edit symmetry mode, pick up an existing symmetry to edit it.</td></tr>
 		<tr><td>Escape</td>	<td>When in edit sym. mode, delete symmetry you are currently editing</td></tr>
+		<tr><td>1 - 5</td>	<td>Set line color to color #N from color history</td></tr>
+		<tr><td>Shift-(1 - 5)</td>	<td>Set background color to color #N from color history</td></tr>
 		<tr><td>?</td>			<td>Open this dialog</td></tr>
 	</table>
 </div>
