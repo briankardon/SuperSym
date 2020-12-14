@@ -762,6 +762,7 @@ function colorHistoryClickHandler(event, colorHistoryNum) {
 			$('#lineColor').val(color);
 		}
 	}
+	updateCanvas();
 }
 
 function setLineColor(color) {
@@ -1069,7 +1070,7 @@ $(function () {
 	$("#drawTransparency").on('change', updateCanvas)
 
 	// Set version number
-	$("#footer").html($('#footer').html()+'1.08')
+	$("#footer").html($('#footer').html()+'1.09')
 });
 
 function flatCoord(x, y, numPerPixel) {
