@@ -215,12 +215,23 @@ function rgbToHex(rgb) {
 
 function hexToRgb(hex) {
     var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-    return result ? {
-        r: parseInt(result[1], 16),
-        g: parseInt(result[2], 16),
-        b: parseInt(result[3], 16)
-    } : null;
+		if (result) {
+			return [parseInt(result[1], 16), parseInt(result[2], 16), parseInt(result[3], 16)];
+		} else {
+			return null;
+		}
+    // return result ? {
+    //     r: parseInt(result[1], 16),
+    //     g: parseInt(result[2], 16),
+    //     b: parseInt(result[3], 16)
+    // } : null;
 }
+
+function rgbToString(rgb) {
+	// Convert rgb vector to a string of the from 'rgb(55, 44, 33)'
+	return 'rgb('+rgb[0]+', '+rgb[1]+', '+rgb[2]+')';
+}
+
 // *************************************
 function saveCurrentSymmetryConfiguration() {
 	var name = document.getElementById("storeSymmetryName").value;
@@ -678,9 +689,9 @@ function getSelectedLineColor() {
 		var outputColor = "rgb("+r+", "+g+", "+b+")";
 		return outputColor;
 	} else {
-        //         console.log($("#color").val());
-        // return $("#color").val();
-        return $("#lineColor").val();
+    //         console.log($("#color").val());
+    // return $("#color").val();
+    return $("#lineColor").val();
 	}
 }
 function getSelectedBackgroundColor() {
@@ -688,7 +699,7 @@ function getSelectedBackgroundColor() {
 }
 
 function updateColorHistory() {
-	let lineColor = getSelectedLineColor();
+	let lineColor =	rgbToString(hexToRgb(getSelectedLineColor()));
 	let backColor = getSelectedBackgroundColor();
 	let isLineColorNew = true;
 	let isBackColorNew = true;
@@ -706,6 +717,8 @@ function updateColorHistory() {
 		nextHistoryNum = 1;
 	}
 
+	console.log(historyColors);
+	console.log(lineColor);
 	if (!historyColors.includes(lineColor)) {
 		// Line color is new - add it to history
 		addColorHistoryButton(lineColor, nextHistoryNum);
@@ -1070,7 +1083,7 @@ $(function () {
 	$("#drawTransparency").on('change', updateCanvas)
 
 	// Set version number
-	$("#footer").html($('#footer').html()+'1.09')
+	$("#footer").html($('#footer').html()+'1.10')
 });
 
 function flatCoord(x, y, numPerPixel) {
