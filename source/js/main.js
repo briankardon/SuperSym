@@ -621,7 +621,6 @@ function mouseoutHandler(evt) {
 	lastMouseX = undefined;
 	lastMouseY = undefined;
 	if (mode == "editSymmetries") {
-		// console.log("mouse out");
 		temporarySymmetry = undefined;
 		updateCanvas();
 		recalculateSymmetries();
@@ -689,8 +688,6 @@ function getSelectedLineColor() {
 		var outputColor = "rgb("+r+", "+g+", "+b+")";
 		return outputColor;
 	} else {
-    //         console.log($("#color").val());
-    // return $("#color").val();
     return $("#lineColor").val();
 	}
 }
@@ -717,8 +714,6 @@ function updateColorHistory() {
 		nextHistoryNum = 1;
 	}
 
-	console.log(historyColors);
-	console.log(lineColor);
 	if (!historyColors.includes(lineColor)) {
 		// Line color is new - add it to history
 		addColorHistoryButton(lineColor, nextHistoryNum);
@@ -731,10 +726,7 @@ function updateColorHistory() {
 		}).get();
 		// let minHistoryNum = Math.min(...historyNums);
 		// Delete the oldest color to make room for new one
-		$("#colorTools").find("button.colorHistory:contains('1')").remove();
-		$("#colorTools").find("button.colorHistory").each(function(k, element) {
-			$(element).text(k+1);
-		});
+		removeColorHistoryButton(1);
 	}
 	// if (!historyColors.includes(backColor)) {
 	// 	// Background color is new - add it to history
@@ -746,7 +738,7 @@ function addColorHistoryButton(color, num) {
 	let colorHistoryButton = $("<button/>", {
 		"text": num,
 		"class": "colorHistory",
-		"onclick": 'colorHistoryClickHandler(event, '+num+')',
+		"onclick": 'colorHistoryClickHandler(event, this)',
 		"appendTo": $("#colorTools")
 	}).css({
 		"background-color": color,
@@ -765,15 +757,45 @@ function addColorHistoryButton(color, num) {
 	}
 }
 
-function colorHistoryClickHandler(event, colorHistoryNum) {
-	let colorHistoryButton = $("#colorTools").find("button.colorHistory:contains('"+colorHistoryNum+"')");
-	if (colorHistoryButton.length > 0) {
-		let color = rgbToHex(parseRGBString($(colorHistoryButton).css('background-color')));
-		if (event.shiftKey) {
-			$('#backgroundColor').val(color);
-		} else {
-			$('#lineColor').val(color);
-		}
+function removeColorHistoryButton(numOrButton) {
+	let buttonFound;
+	if (typeof(numOrButton) == 'number') {
+		buttonFound = $("#colorTools").find("button.colorHistory:contains('"+numOrButton+"')");
+	} else {
+		buttonFound = $(numOrButton);
+	}
+
+	if (buttonFound.length > 0) {
+		buttonFound.remove();
+		$("#colorTools").find("button.colorHistory").each(function(k, element) {
+			$(element).text(k+1);
+		});
+	}
+}
+
+function colorHistoryClickHandler(event, numOrButton) {
+	let buttonFound;
+	switch (typeof(numOrButton)) {
+		case 'string':
+			buttonFound = parseInt(buttonFound);
+		case 'number':
+			buttonFound = $("#colorTools").find("button.colorHistory:contains('"+numOrButton+"')");
+			break;
+		default:
+			buttonFound = $(numOrButton);
+	}
+	if (buttonFound.length == 0) {
+		// No button with that number found.
+		return;
+	}
+	let colorString = buttonFound.css('background-color');
+	let color = rgbToHex(parseRGBString(colorString));
+	if (event.shiftKey) {
+		$('#backgroundColor').val(color);
+	} else if (event.ctrlKey || event.altKey) {
+		removeColorHistoryButton(buttonFound);
+	} else {
+		$('#lineColor').val(color);
 	}
 	updateCanvas();
 }
@@ -797,7 +819,6 @@ function touchstartHandler(evt) {
 
 function clickHandler(evt, touchType) {
 	// touchType is undefined if this is a mouse event, 'start', or 'end' if it's a touch event.
-	// console.log('clickHandler! touchType=', touchType)
 	if (mode == "editSymmetries") {
 		if (hoverSymmetryIndex == null || (!evt.ctrlKey && !evt.altKey)) {   // Not clicking on an existing symmetry
 			if (temporarySymmetry != undefined) {    // Temporary symmetry exists
@@ -824,7 +845,7 @@ function clickHandler(evt, touchType) {
 						temporarySymmetry = undefined;
 					}
 				} else {
-					console.log("This should not happen unless this is a touch device");
+					// console.log("This should not happen unless this is a touch device");
 				}
 			}
 		} else if (evt.ctrlKey | evt.altKey) {    // Clicking on an existing symmetry with control key down
