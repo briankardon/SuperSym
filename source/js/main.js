@@ -1133,8 +1133,8 @@ $(function () {
 	lastSymmetryOrders.rotation = 7;
 	lastSymmetryOrders.scale = 5;
 	lastSymmetryOrders.translation = 7;
-	lastSymmetryOrders.glide = 7;
-	lastSymmetryOrders.spiral = 7;
+	lastSymmetryOrders.glide = 18;
+	lastSymmetryOrders.spiral = 18;
 
 	//Setup event callbacks:
 	$("#symmetryType").on(
@@ -1314,7 +1314,9 @@ function drawPointSymmetry(sym, color, alpha, verbose) {
 function drawSpiralSymmetry(sym, color, alpha, verbose) {
 	// drawRotationalSymmetry(sym, color, alpha, verbose);
 	drawScaleSymmetry(sym, color, alpha, verbose);
+	drawCtx.globalAlpha = alpha;
 	drawRadiatingArcs(sym.point1[0], sym.point1[1], sym.order, scaleBaseRadius, [2, 8]);
+	drawCtx.globalAlpha = 1.0;
 }
 function drawGlideSymmetry(sym, color, alpha, verbose) {
 	let point1 = sym.point1;
