@@ -1544,7 +1544,7 @@ function updateCanvas() {
 		drawCtx.globalAlpha = getDrawTransparency();
 
 		var currentColor;
-		var startNewSegment = false;
+		var startNewSegment;
 
 		drawCtx.lineWidth = 1;
 		drawCtx.strokeStyle = currentColor;
@@ -1554,27 +1554,33 @@ function updateCanvas() {
 
 		drawCtx.beginPath();
 		for (var traceNum = 0; traceNum < traceX.length; traceNum++) {
-			drawCtx.moveTo(traceX[traceNum][0], traceY[traceNum][0]);
-			for (var k = 1; k < traceX[traceNum].length; k++){
-				if (isNaN(traceX[traceNum][k]) || k == traceX[traceNum].length - 1 || traceC[traceNum][k] != currentColor) {
+			startNewSegment = true;
+			for (var k = 0; k < traceX[traceNum].length; k++){
+				if (isNaN(traceX[traceNum][k]) ||  traceC[traceNum][k] != currentColor) {
+					startNewSegment = true;
 					if (isNaN(traceX[traceNum][k])) {
-						startNewSegment = true;
-						//						drawCtx.moveTo(traceX[traceNum][k], traceY[traceNum][k]);
+						continue;
 					}
-					drawCtx.strokeStyle = currentColor;
-					drawCtx.stroke();
-					currentColor = traceC[traceNum][k];
-					drawCtx.beginPath();
 				}
 				if (startNewSegment) {
+					// Stroke last segment
+					drawCtx.strokeStyle = currentColor;
+					drawCtx.stroke();
+					// Start new segment
+					drawCtx.beginPath();
 					drawCtx.moveTo(traceX[traceNum][k], traceY[traceNum][k]);
+
+					currentColor = traceC[traceNum][k];
 					startNewSegment = false;
 				} else {
+					// Continue current segment
 					drawCtx.lineTo(traceX[traceNum][k], traceY[traceNum][k]);
 				}
-
 			}
 		}
+		drawCtx.strokeStyle = currentColor;
+		drawCtx.stroke();
+
 		drawCtx.globalAlpha = 1.0;
 
 	}
