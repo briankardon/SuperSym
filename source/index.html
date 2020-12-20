@@ -50,7 +50,19 @@
 
 		<fieldset class="toolBarElement">
 			<label for="" class="toolBarSubElementHeader">Symmetry type:</label>
-		  <label for="point">
+
+			<select class="toolBarSubElement" name="symmetryType" id="symmetryType" width="8">
+				<option class="toolBarSubElement" value="point" selected>point</option>
+				<option class="toolBarSubElement" value="rotation">rotation</option>
+				<option class="toolBarSubElement" value="line">line</option>
+				<option class="toolBarSubElement" value="translation">translation</option>
+				<option class="toolBarSubElement" value="scale">scale</option>
+				<option class="toolBarSubElement" value="spiral">spiral</option>
+				<option class="toolBarSubElement" value="glide">glide</option>
+			</select>
+			<input type="number" class="toolBarSubElement" id="symOrder" name="symOrder" step="1" min="2" max="64" value=7>
+
+		  <!-- <label for="point">
 	      <input type="radio" class="toolBarSubElement" id="point" name="symmetryType" value="point" checked>
 	      <span  class="toolBarSubElement">Point</span>
 		  </label>
@@ -77,6 +89,18 @@
 		    <span class="toolBarSubElement">Scale:</span>
 			  <input type="number" class="toolBarSubElement" id="scaleNum" name="scaleNum" step="1" min="1" max="10" value=5>
 		  </label>
+
+			<label for="spiral">
+		    <input type="radio" class="toolBarSubElement" id="spiral" name="symmetryType" value="spiral">
+		    <span class="toolBarSubElement">Spiral:</span>
+			  <input type="number" class="toolBarSubElement" id="spiralNum" name="spiralNum" step="1" min="1" max="10" value=5>
+		  </label>
+
+			<label for="glide">
+		    <input type="radio" class="toolBarSubElement" id="glide" name="symmetryType" value="glide">
+		    <span class="toolBarSubElement">Glide:</span>
+			  <input type="number" class="toolBarSubElement" id="glideNum" name="glideNum" step="1" min="1" max="10" value=5>
+		  </label> -->
 
 		</fieldset>
 

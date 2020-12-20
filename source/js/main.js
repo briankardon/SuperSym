@@ -40,8 +40,14 @@ $(document).keyup(function(e) {
 		case 'r':
 			setSymmetryType("rotation")
 			break;
+		case 'R':
+			setSymmetryType("spiral");
+			break;
 		case 'l':
 			setSymmetryType("line")
+			break;
+		case 'L':
+			setSymmetryType('glide');
 			break;
 		case 't':
 			setSymmetryType("translation")
@@ -83,7 +89,7 @@ $(document).keyup(function(e) {
 		case '%':
 			colorHistoryClickHandler(e, '5');
 			break;
-}
+	}
 });
 
 function setSymmetryType(type) {
@@ -121,17 +127,17 @@ function setUpModal() {
 	var closeButton = document.getElementById("closeButton");
 	// When the user clicks on the button, open the modal:
 	FAQlink.onclick = function() {
-	    modal.style.display = "block";
+		modal.style.display = "block";
 	}
 	// When the user clicks on <span> (x), close the modal
 	closeButton.onclick = function() {
-	    modal.style.display = "none";
+		modal.style.display = "none";
 	}
 	// When the user clicks anywhere outside of the modal, close it
 	window.onclick = function(event) {
-	    if (event.target == modal) {
-	        modal.style.display = "none";
-	    }
+		if (event.target == modal) {
+			modal.style.display = "none";
+		}
 	}
 }
 
@@ -153,18 +159,18 @@ document.onkeydown = DocumentKeyPressHandler;
 // Thanks to vahidk (https://gist.github.com/vahidk) for the color conversion code
 
 function rgbToHsl(r, g, b) {
-  r /= 255; g /= 255; b /= 255;
-  let max = Math.max(r, g, b);
-  let min = Math.min(r, g, b);
-  let d = max - min;
-  let h;
-  if (d === 0) h = 0;
-  else if (max === r) h = (g - b) / d % 6;
-  else if (max === g) h = (b - r) / d + 2;
-  else if (max === b) h = (r - g) / d + 4;
-  let l = (min + max) / 2;
-  let s = d === 0 ? 0 : d / (1 - Math.abs(2 * l - 1));
-  return [h * 60, s, l];
+	r /= 255; g /= 255; b /= 255;
+	let max = Math.max(r, g, b);
+	let min = Math.min(r, g, b);
+	let d = max - min;
+	let h;
+	if (d === 0) h = 0;
+	else if (max === r) h = (g - b) / d % 6;
+	else if (max === g) h = (b - r) / d + 2;
+	else if (max === b) h = (r - g) / d + 4;
+	let l = (min + max) / 2;
+	let s = d === 0 ? 0 : d / (1 - Math.abs(2 * l - 1));
+	return [h * 60, s, l];
 }
 
 function getContrastingRGBColor(rgb) {
@@ -175,22 +181,23 @@ function getContrastingRGBColor(rgb) {
 }
 
 function hslToRgb(h, s, l) {
-  let c = (1 - Math.abs(2 * l - 1)) * s;
-  let hp = h / 60.0;
-  let x = c * (1 - Math.abs((hp % 2) - 1));
-  let rgb1;
-  if (isNaN(h)) rgb1 = [0, 0, 0];
-  else if (hp <= 1) rgb1 = [c, x, 0];
-  else if (hp <= 2) rgb1 = [x, c, 0];
-  else if (hp <= 3) rgb1 = [0, c, x];
-  else if (hp <= 4) rgb1 = [0, x, c];
-  else if (hp <= 5) rgb1 = [x, 0, c];
-  else if (hp <= 6) rgb1 = [c, 0, x];
-  let m = l - c * 0.5;
-  return [
-    Math.round(255 * (rgb1[0] + m)),
-    Math.round(255 * (rgb1[1] + m)),
-    Math.round(255 * (rgb1[2] + m))];
+	let c = (1 - Math.abs(2 * l - 1)) * s;
+	let hp = h / 60.0;
+	let x = c * (1 - Math.abs((hp % 2) - 1));
+	let rgb1;
+	if (isNaN(h)) rgb1 = [0, 0, 0];
+	else if (hp <= 1) rgb1 = [c, x, 0];
+	else if (hp <= 2) rgb1 = [x, c, 0];
+	else if (hp <= 3) rgb1 = [0, c, x];
+	else if (hp <= 4) rgb1 = [0, x, c];
+	else if (hp <= 5) rgb1 = [x, 0, c];
+	else if (hp <= 6) rgb1 = [c, 0, x];
+	let m = l - c * 0.5;
+	return [
+		Math.round(255 * (rgb1[0] + m)),
+		Math.round(255 * (rgb1[1] + m)),
+		Math.round(255 * (rgb1[2] + m))
+	];
 }
 // *************************************
 
@@ -200,8 +207,8 @@ function hslToRgb(h, s, l) {
 // User Tim Down (https://stackoverflow.com/users/96100/tim-down)
 
 function componentToHex(c) {
-    var hex = c.toString(16);
-    return hex.length == 1 ? "0" + hex : hex;
+	var hex = c.toString(16);
+	return hex.length == 1 ? "0" + hex : hex;
 }
 
 function parseRGBString(rgb) {
@@ -210,21 +217,21 @@ function parseRGBString(rgb) {
 }
 
 function rgbToHex(rgb) {
-    return "#" + componentToHex(rgb[0]) + componentToHex(rgb[1]) + componentToHex(rgb[2]);
+	return "#" + componentToHex(rgb[0]) + componentToHex(rgb[1]) + componentToHex(rgb[2]);
 }
 
 function hexToRgb(hex) {
-    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-		if (result) {
-			return [parseInt(result[1], 16), parseInt(result[2], 16), parseInt(result[3], 16)];
-		} else {
-			return null;
-		}
-    // return result ? {
-    //     r: parseInt(result[1], 16),
-    //     g: parseInt(result[2], 16),
-    //     b: parseInt(result[3], 16)
-    // } : null;
+	var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	if (result) {
+		return [parseInt(result[1], 16), parseInt(result[2], 16), parseInt(result[3], 16)];
+	} else {
+		return null;
+	}
+	// return result ? {
+	//     r: parseInt(result[1], 16),
+	//     g: parseInt(result[2], 16),
+	//     b: parseInt(result[3], 16)
+	// } : null;
 }
 
 function rgbToString(rgb) {
@@ -279,137 +286,183 @@ function importSymmetriesFromUser() {
 }
 
 class symmetry {
-    constructor(type, level, point1, point2, order) {
+	constructor(type, level, point1, point2, order) {
 		// type = "point", "line", "rotation", "translation", "scale", or "identity"
-    this.type = type;
+		this.type = type;
 		this.level = level;
-    this.point1 = point1;
-    this.point2 = point2;
+		this.point1 = point1;
+		this.point2 = point2;
 		this.order = order;
-    }
-		static fromObject(obj) {
-			// Convert a generic deserialized symmetry object into a symmetry object
-			return new symmetry(obj.type, obj.level, obj.point1, obj.point2, obj.order);
+	}
+	static fromObject(obj) {
+		// Convert a generic deserialized symmetry object into a symmetry object
+		return new symmetry(obj.type, obj.level, obj.point1, obj.point2, obj.order);
+	}
+	static fromJSON(serializedSymmetry) {
+		var obj = JSON.parse(serializedSymmetry);
+		return new symmetry(obj.type, obj.level, obj.point1, obj.point2, obj.order);
+	}
+	getName() {
+		switch (this.type) {
+			case "point":
+				return this.level + ":point";
+				break;
+			case "line":
+				return this.level + ":line";
+				break;
+			case "rotation":
+				return this.level + ":rot"+obj.order;
+				break;
+			case "translation":
+				return this.level + ":trans"+obj.order;
+				break;
+			case "scale":
+				return this.level + ":scale"+obj.order;
+				break;
+			case "identity":
+				return this.level + ":I";
+				break;
+				case "glide":
+					return this.level + ":lt";
+					break;
+				case "spiral":
+					return this.level + ":rs";
+					break;
 		}
-		static fromJSON(serializedSymmetry) {
-			var obj = JSON.parse(serializedSymmetry);
-			return new symmetry(obj.type, obj.level, obj.point1, obj.point2, obj.order);
+	}
+	distSqTo(x, y) {
+		var distSq1, distSq2;
+		if (this.point1 != null) {
+			distSq1 = (x-this.point1[0])**2 + (y-this.point1[1])**2;
+		} else {
+			distSq1 = Number.POSITIVE_INFINITY;
 		}
-		getName() {
-			switch (this.type) {
-				case "point":
-					return this.level + ":point";
-					break;
-				case "line":
-					return this.level + ":line";
-					break;
-				case "rotation":
-					return this.level + ":rot"+obj.order;
-					break;
-				case "translation":
-					return this.level + ":trans"+obj.order;
-					break;
-				case "scale":
-					return this.level + ":scale"+obj.order;
-					break;
-				case "identity":
-					return this.level + ":I";
-					break;
-			}
+		if (this.point2 != null) {
+			distSq2 = (x-this.point2[0])**2 + (y-this.point2[1])**2;
+		} else {
+			distSq2 = Number.POSITIVE_INFINITY;
 		}
-		distSqTo(x, y) {
-			var distSq1, distSq2;
-			if (this.point1 != null) {
-				distSq1 = (x-this.point1[0])**2 + (y-this.point1[1])**2;
-			} else {
-				distSq1 = Number.POSITIVE_INFINITY;
-			}
-			if (this.point2 != null) {
-				distSq2 = (x-this.point2[0])**2 + (y-this.point2[1])**2;
-			} else {
-				distSq2 = Number.POSITIVE_INFINITY;
-			}
-			return [distSq1, distSq2];
-		}
-		symmetrize(x, y) {
-      switch (this.type) {
-				case "point":
-					var newX = [];
-					var newY = [];
-					var deltaX, deltaY;
-					deltaX = this.point1[0] - x;
-					deltaY = this.point1[1] - y;
-					return [[this.point1[0]+deltaX], [this.point1[1]+deltaY]];
-				case "identity":
-					return [[], []]
-				case "line":
-					let point2 = this.point2;
-					if (point2 == undefined) {
-						point2 = getTempPoint2(this.point1);
+		return [distSq1, distSq2];
+	}
+	symmetrize(x, y) {
+		var newXs = [];
+		var newYs = [];
+		var newX, newY;
+		switch (this.type) {
+			case "point":
+				let deltaX, deltaY;
+				deltaX = this.point1[0] - x;
+				deltaY = this.point1[1] - y;
+				newXs = [this.point1[0]+deltaX];
+				newYs = [this.point1[1]+deltaY];
+				break;
+			case "identity":
+				newXs = [];
+				newYs = [];
+				break;
+			case "line":
+				let point2 = this.point2;
+				if (point2 == undefined) {
+					point2 = getTempPoint2(this.point1);
+				}
+				let [x2, y2] = reflect(x, y, this.point1[0], this.point1[1], point2[0], point2[1]);
+				newXs = [x2];
+				newYs = [y2];
+				break;
+			case "translation":
+				if (this.point2 != null && this.point1 != null) {
+					let dx = this.point2[0] - this.point1[0];
+					let dy = this.point2[1] - this.point1[1];
+					for (let t = 0; t < this.order; t++) {
+						[newX, newY] = [x+dx*(t+1), y+dy*(t+1)];
+						newXs[t] = newX;
+						newYs[t] = newY;
 					}
-					var dx0 = point2[0] - this.point1[0];
-					var dy0 = point2[1] - this.point1[1];
-					var dx1 = x - this.point1[0];
-					var dy1 = y - this.point1[1];
-					var l0 = Math.sqrt(dx0*dx0 + dy0*dy0);
-					var l1 = Math.sqrt(dx1*dx1 + dy1*dy1);
-					var dparallel = (dx0 * dx1 + dy0 * dy1) / l0;
-					var fparallel = dparallel / l0;
-					var dx2 = dx0 * fparallel;
-					var dy2 = dy0 * fparallel;
-					// Point 3 is projection onto line
-					var point3 = [this.point1[0] + dx2, this.point1[1]+dy2];
-					var point4 = [point3[0] + point3[0] - x, point3[1] + point3[1] - y];
-					return [[point4[0]], [point4[1]]];
-				case "rotation":
-					var newXs = [];
-					var newYs = [];
-					var newX, newY;
-					var angle = 2*Math.PI / this.order;
-					for (var r = 0; r < this.order-1; r++) {
-						newX = x - this.point1[0];
-						newY = y - this.point1[1];
-						[newX, newY] = [
-							Math.cos(angle*(r+1))*newX - Math.sin(angle*(r+1))*newY + this.point1[0],
-							Math.sin(angle*(r+1))*newX + Math.cos(angle*(r+1))*newY + this.point1[1]
-						];
-						newXs[r] = newX;
-						newYs[r] = newY;
-					}
-					return [newXs, newYs];
-				case "translation":
-					var newXs = [];
-					var newYs = [];
-					if (this.point2 != null && this.point1 != null) {
-						var newX, newY;
-						var dx = this.point2[0] - this.point1[0];
-						var dy = this.point2[1] - this.point1[1];
-						for (var t = 0; t < this.order; t++) {
-							[newX, newY] = [x+dx*(t+1), y+dy*(t+1)];
-							newXs[t] = newX;
-							newYs[t] = newY;
+				}
+				break;
+			case "glide":
+				if (this.point2 != null && this.point1 != null) {
+					let [xr, yr] = reflect(x, y, this.point1[0], this.point1[1], this.point2[0], this.point2[1]);
+					let dx = this.point2[0] - this.point1[0];
+					let dy = this.point2[1] - this.point1[1];
+					for (let g = 0; g < this.order; g++) {
+						if ((g % 2) == 0) {
+							// Use reflected point
+							[newX, newY] = [xr+dx*(g+1), yr+dy*(g+1)];
+						} else {
+							// Use original point
+							[newX, newY] = [x+dx*(g+1), y+dy*(g+1)];
 						}
+						newXs[g] = newX;
+						newYs[g] = newY;
 					}
-					return [newXs, newYs];
-				case "scale":
-					var newXs = [];
-					var newYs = [];
-					if (this.point2 != null && this.point1 != null) {
-						var newX, newY;
-						var scaleFactor = Math.sqrt((this.point2[0]-this.point1[0])**2 + (this.point2[1]-this.point1[1])**2)/scaleBaseRadius
-						var dx = x - this.point1[0];
-						var dy = y - this.point1[1];
-						for (var t = 0; t < this.order; t++) {
-							[newX, newY] = [this.point1[0]+dx*(scaleFactor**(t+1)), this.point1[1]+dy*(scaleFactor**(t+1))];
-							newXs[t] = newX;
-							newYs[t] = newY;
-						}
+				}
+				break;
+			case "scale":
+				if (this.point2 != null && this.point1 != null) {
+					var scaleFactor = Math.sqrt((this.point2[0]-this.point1[0])**2 + (this.point2[1]-this.point1[1])**2)/scaleBaseRadius
+					let dx = x - this.point1[0];
+					let dy = y - this.point1[1];
+					for (let t = 0; t < this.order; t++) {
+						[newX, newY] = scale(x, y, this.point1[0], this.point1[1], (scaleFactor**(t+1)));
+						newXs[t] = newX;
+						newYs[t] = newY;
 					}
-					return [newXs, newYs];
-				default:
-					console.log("error, invalid symmetry type");
-			}
-    }
+				}
+				break;
+			case "rotation":
+				var angle = 2*Math.PI / this.order;
+				for (let r = 0; r < this.order-1; r++) {
+					[newX, newY] = rotate(x, y, this.point1[0], this.point1[1], angle*(r+1));
+					newXs[r] = newX;
+					newYs[r] = newY;
+				}
+				break;
+			case "spiral":
+				var angle = 2*Math.PI / this.order;
+				var scaleFactor = Math.sqrt((this.point2[0]-this.point1[0])**2 + (this.point2[1]-this.point1[1])**2)/scaleBaseRadius
+				for (let s = 0; s < this.order; s++) {
+					[newX, newY] = rotate(x, y, this.point1[0], this.point1[1], angle*(s+1));
+					[newX, newY] = scale(newX, newY, this.point1[0], this.point1[1], (scaleFactor**(s+1)));
+					newXs[s] = newX;
+					newYs[s] = newY;
+				}
+				break;
+			default:
+				console.log("error, invalid symmetry type");
+				newXs = [];
+				newYs = [];
+				break;
+		}
+		return [newXs, newYs];
+	}
+}
+
+function reflect(x, y, x1, y1, x2, y2) {
+	// Reflect point (x, y) about a line defined by points (x1, y1) and (x2, y2)
+	let dx0 = x2 - x1;
+	let dy0 = y2 - y1;
+	let dx1 = x - x1;
+	let dy1 = y - y1;
+	let fparallel = ((dx0 * dx1 + dy0 * dy1) / (dx0 * dx0 + dy0 * dy0));
+	let dx2 = dx0 * fparallel;
+	let dy2 = dy0 * fparallel;
+	// (x4, y4) is the reflection of (x, y) across line
+	return [2*(x1 + dx2) - x, 2*(y1 + dy2) - y];
+}
+function scale(x, y, x1, y1, f) {
+	// Scale point (x, y) relative to point (x1, y1) by factor f
+	let dx = x - x1;
+	let dy = y - y1;
+	return [x1+dx*f, y1+dy*f];
+}
+function rotate(x, y, x1, y1, a) {
+	// Rotate point (x, y) around point (x1, y1) by angle a (in radians)
+	let dx = x - x1;
+	let dy = y - y1;
+	let c = Math.cos(a);
+	let s = Math.sin(a);
+	return [c*dx - s*dy + x1, s*dx + c*dy + y1];
 }
 
 var traceX = [[]];
@@ -438,13 +491,13 @@ function initializeSymmetryList(otherSymmetries) {
 		otherSymmetries = [];
 	}
 	var symmetryList = [
-	//	new symmetry("point", 1, [950, 400]),
+		//	new symmetry("point", 1, [950, 400]),
 		new symmetry("identity", 0, null, null, 0),
-	//	new symmetry("point", 2, [700, 400]),
-	//	new symmetry("line", 1, [0, 200], [100, 210]),
-	//	new symmetry("line", 1, [0, 300], [100, 250]),
-	//	new symmetry("rotation", 1, [750, 400], false, 7),
-	//	new symmetry("rotation", 1, [600, 200], false, 4)
+		//	new symmetry("point", 2, [700, 400]),
+		//	new symmetry("line", 1, [0, 200], [100, 210]),
+		//	new symmetry("line", 1, [0, 300], [100, 250]),
+		//	new symmetry("rotation", 1, [750, 400], false, 7),
+		//	new symmetry("rotation", 1, [600, 200], false, 4)
 	];
 	return symmetryList.concat(otherSymmetries);
 }
@@ -465,13 +518,13 @@ function setModeIndicator(newMode) {
 }
 
 function setMode(newMode) {
-//	if (mode == "draw" && newMode == "editSymmetries") {
-//		showDrawing = false;
-//		showSymmetries = true;
-//	} else if (mode == "editSymmetries" && newMode == "draw") {
-//		showDrawing = true;
-//		showSymmetries = false;
-//	}
+	//	if (mode == "draw" && newMode == "editSymmetries") {
+	//		showDrawing = false;
+	//		showSymmetries = true;
+	//	} else if (mode == "editSymmetries" && newMode == "draw") {
+	//		showDrawing = true;
+	//		showSymmetries = false;
+	//	}
 	mode = newMode;
 }
 
@@ -652,17 +705,17 @@ function rejoinSegment() {
 }
 
 function getCanvasCoords(evt, isTouch) {
-    var rect = drawCanvas.getBoundingClientRect();
-		var rawX, rawY;
-		if (isTouch) {
-			rawX = evt.touches[0].clientX;
-			rawY = evt.touches[0].clientY;
-		} else {
-			rawX = evt.clientX;
-			rawY = evt.clientY;
-		}
-    var x = rawX - rect.left;
-    var y = rawY - rect.top;
+	var rect = drawCanvas.getBoundingClientRect();
+	var rawX, rawY;
+	if (isTouch) {
+		rawX = evt.touches[0].clientX;
+		rawY = evt.touches[0].clientY;
+	} else {
+		rawX = evt.clientX;
+		rawY = evt.clientY;
+	}
+	var x = rawX - rect.left;
+	var y = rawY - rect.top;
 	return [x, y];
 }
 
@@ -678,6 +731,14 @@ function getScaleNum() {
 	return $('#scaleNum').val();
 }
 
+function getSpiralNum() {
+	return $('#spiralNum').val();
+}
+
+function getGlideNum() {
+	return $('#glideNum').val();
+}
+
 var rainbowHue = 0;
 var rainbowHueStep = 1;
 function getSelectedLineColor() {
@@ -688,7 +749,7 @@ function getSelectedLineColor() {
 		var outputColor = "rgb("+r+", "+g+", "+b+")";
 		return outputColor;
 	} else {
-    return $("#lineColor").val();
+		return $("#lineColor").val();
 	}
 }
 function getSelectedBackgroundColor() {
@@ -777,12 +838,12 @@ function colorHistoryClickHandler(event, numOrButton) {
 	let buttonFound;
 	switch (typeof(numOrButton)) {
 		case 'string':
-			buttonFound = parseInt(buttonFound);
+		buttonFound = parseInt(buttonFound);
 		case 'number':
-			buttonFound = $("#colorTools").find("button.colorHistory:contains('"+numOrButton+"')");
-			break;
+		buttonFound = $("#colorTools").find("button.colorHistory:contains('"+numOrButton+"')");
+		break;
 		default:
-			buttonFound = $(numOrButton);
+		buttonFound = $(numOrButton);
 	}
 	if (buttonFound.length == 0) {
 		// No button with that number found.
@@ -822,7 +883,7 @@ function clickHandler(evt, touchType) {
 	if (mode == "editSymmetries") {
 		if (hoverSymmetryIndex == null || (!evt.ctrlKey && !evt.altKey)) {   // Not clicking on an existing symmetry
 			if (temporarySymmetry != undefined) {    // Temporary symmetry exists
-				if (temporarySymmetry.type == "line" || temporarySymmetry.type == "translation" || temporarySymmetry.type == "scale") {
+				if (temporarySymmetry.type == "line" || temporarySymmetry.type == "translation" || temporarySymmetry.type == "scale" || temporarySymmetry.type == "glide" || temporarySymmetry.type == "spiral") {
 					if (temporarySymmetry.point2 == null) {
 						// Fix first point, begin modifying second point
 						temporarySymmetry.point2 = getCanvasCoords(evt);
@@ -840,7 +901,7 @@ function clickHandler(evt, touchType) {
 					// Beginning screen touch with no temporary symmetry? Create it now.
 					let touchCoords = getCanvasCoords(evt, true);
 					temporarySymmetry = createSpecifiedSymmetry(touchCoords, touchCoords.slice());
-					if (temporarySymmetry.type != "line" && temporarySymmetry.type != "translation" && temporarySymmetry.type != "scale") {
+					if (temporarySymmetry.type != "line" && temporarySymmetry.type != "translation" && temporarySymmetry.type != "scale" && temporarySymmetry.type != "glide"  || temporarySymmetry.type != "spiral") {
 						addSymmetry(temporarySymmetry)
 						temporarySymmetry = undefined;
 					}
@@ -875,10 +936,10 @@ function clickHandler(evt, touchType) {
 		var [x, y] = getCanvasCoords(evt);
 		var color = getSelectedLineColor();
 		floodFill(x, y, color)
-//				var [symXs, symYs] = applySymmetries(x, y, 0);
-//				for (var k = 0; k < symXs.length; k++) {
-//					floodFill(symXs[k], symYs[k], color);
-//				}
+		//				var [symXs, symYs] = applySymmetries(x, y, 0);
+		//				for (var k = 0; k < symXs.length; k++) {
+		//					floodFill(symXs[k], symYs[k], color);
+		//				}
 	}
 }
 
@@ -896,14 +957,14 @@ function mousemoveHandler(evt, isTouch) {
 	// var dm = (Math.sqrt((x-lastMouseX)**2+(y-lastMouseY)**2));
 	lastMouseX = x;
 	lastMouseY = y;
-  if (mode == "draw") {
-  	if (evt.buttons == 1 || isTouch) {
-  		var c = getSelectedLineColor();
+	if (mode == "draw") {
+		if (evt.buttons == 1 || isTouch) {
+			var c = getSelectedLineColor();
 			addPoint(x, y, c);
-  		updateCanvas();
-  	}
-  } else if (mode == "editSymmetries") {
-//		console.log(hoverSymmetryIndex, temporarySymmetry == null ? null : temporarySymmetry.type);
+			updateCanvas();
+		}
+	} else if (mode == "editSymmetries") {
+		//		console.log(hoverSymmetryIndex, temporarySymmetry == null ? null : temporarySymmetry.type);
 		var canvasUpdateNeeded = false;
 		if (!isTouch) {
 			// hovering to edit not yet supported for touch devices
@@ -924,7 +985,7 @@ function mousemoveHandler(evt, isTouch) {
 			}
 		}
 
-    if (temporarySymmetry != undefined) {
+		if (temporarySymmetry != undefined) {
 			canvasUpdateNeeded = true;
 			if (temporarySymmetry.point2 == null) {
 				// Choosing first point...
@@ -933,7 +994,7 @@ function mousemoveHandler(evt, isTouch) {
 				// Choosing second point...
 				temporarySymmetry.point2 = [x, y];
 			}
-    } else {
+		} else {
 			// No temporary symmetry at the moment, create one
 			temporarySymmetry = createSpecifiedSymmetry([x, y]);
 		}
@@ -943,7 +1004,7 @@ function mousemoveHandler(evt, isTouch) {
 		if (evt.shiftKey) {
 			recalculateSymmetries(true);
 		}
-  }
+	}
 	return false;
 }
 
@@ -960,6 +1021,10 @@ function createSpecifiedSymmetry(point1, point2) {
 	} else if (type == "scale") {
 		order = parseInt(getScaleNum());
 	} else if (type == "line") {
+	} else if (type == "spiral") {
+		order = parseInt(getSpiralNum());
+	} else if (type == "glide") {
+		order = parseInt(getGlideNum());
 	}
 	return new symmetry(type, level, point1, point2, order);
 }
@@ -1008,7 +1073,7 @@ function addPredefinedSymmetryConfigurations() {
 function updateCanvasSize() {
 	// Thanks to Stackoverflow user Phrogz for this: https://stackoverflow.com/a/10215724/1460057
 	drawCanvas.offsetWidth;
-  drawCanvas.width  = drawCanvas.offsetWidth > 0 ? drawCanvas.offsetWidth : window.innerWidth;
+	drawCanvas.width  = drawCanvas.offsetWidth > 0 ? drawCanvas.offsetWidth : window.innerWidth;
 	updateCanvas();
 }
 
@@ -1022,19 +1087,19 @@ $(function () {
 	drawCtx = drawCanvas.getContext('2d');
 
 	document.body.addEventListener("touchstart", function (e) {
-	  if (e.target == drawCanvas) {
-	    e.preventDefault();
-	  }
+		if (e.target == drawCanvas) {
+			e.preventDefault();
+		}
 	},  { passive: false });
 	document.body.addEventListener("touchend", function (e) {
-	  if (e.target == drawCanvas) {
-	    e.preventDefault();
-	  }
+		if (e.target == drawCanvas) {
+			e.preventDefault();
+		}
 	}, { passive: false });
 	document.body.addEventListener("touchmove", function (e) {
-	  if (e.target == drawCanvas) {
-	    e.preventDefault();
-	  }
+		if (e.target == drawCanvas) {
+			e.preventDefault();
+		}
 	}, { passive: false });
 
 	// Set up modal
@@ -1050,61 +1115,61 @@ $(function () {
 
 	// Set up export dialog
 	$( "#exportDialog" ).dialog({
-    autoOpen: false
-  });
+		autoOpen: false
+	});
 	$("#shortcutKeyDialog").dialog({
 		autoOpen: false
 	});
 
-		// Set splash page to fade
-	 setTimeout(function() {
-	    $("#splash").fadeOut(1000, function() {
-	       $("#content").show();
-	    });
-	 }, 300);
+	// Set splash page to fade
+	setTimeout(function() {
+		$("#splash").fadeOut(1000, function() {
+			$("#content").show();
+		});
+	}, 300);
 
 
-    $("#color").spectrum({
-        flat: true,
-        showInitial: true,
-        showInput: true,
-        showPalette: true,
-        palette: [ ],
-        preferredFormat: "rgb",
-//        localStorageKey: "supersym.colors",
-        showSelectionPalette: true, // true by default
-        selectionPalette: []
-    });
+	$("#color").spectrum({
+		flat: true,
+		showInitial: true,
+		showInput: true,
+		showPalette: true,
+		palette: [ ],
+		preferredFormat: "rgb",
+		//        localStorageKey: "supersym.colors",
+		showSelectionPalette: true, // true by default
+		selectionPalette: []
+	});
 
 	//Setup event callbacks:
 	$("input[name=symmetryType]").on('click touchstart',
-		function(){
-			setModeIndicator("editSymmetries");
-		}
-	);
-	$("#drawCanvas").on('mousedown touchstart',
-		function (evt) {
-			if (mode == "draw" && evt.shiftKey) {
-				restartFromLast();
-			}
-		}
-	)
-	$("#drawCanvas").on('click', clickHandler);
-	$("#drawCanvas").on('touchstart', touchstartHandler);
+	function(){
+		setModeIndicator("editSymmetries");
+	}
+);
+$("#drawCanvas").on('mousedown touchstart',
+function (evt) {
+	if (mode == "draw" && evt.shiftKey) {
+		restartFromLast();
+	}
+});
 
-	$("#symmetryTransparency").val(0.3);
-	$("#drawTransparency").val(1.0);
+$("#drawCanvas").on('click', clickHandler);
+$("#drawCanvas").on('touchstart', touchstartHandler);
+
+$("#symmetryTransparency").val(0.3);
+$("#drawTransparency").val(1.0);
 
 
-	$("#drawCanvas").on('mouseout', mouseoutHandler);
-	$("#drawCanvas").on('touchend', touchendHandler);
-	$("#drawCanvas").on('mousemove', mousemoveHandler);
-	$("#drawCanvas").on('touchmove', touchmoveHandler);
-	$("#symmetryTransparency").on('change', updateCanvas)
-	$("#drawTransparency").on('change', updateCanvas)
+$("#drawCanvas").on('mouseout', mouseoutHandler);
+$("#drawCanvas").on('touchend', touchendHandler);
+$("#drawCanvas").on('mousemove', mousemoveHandler);
+$("#drawCanvas").on('touchmove', touchmoveHandler);
+$("#symmetryTransparency").on('change', updateCanvas)
+$("#drawTransparency").on('change', updateCanvas)
 
-	// Set version number
-	$("#footer").html($('#footer').html()+'1.10')
+// Set version number
+$("#footer").html($('#footer').html()+'1.10')
 });
 
 function flatCoord(x, y, numPerPixel) {
@@ -1133,7 +1198,7 @@ function floodFill(x, y, color) {
 	for (let point of borderPixSet) {
 		borderPixels.push(JSON.parse(point));
 	}
-//	var [borderXs, borderYs] = orderBorderPoints(borderPixels);
+	//	var [borderXs, borderYs] = orderBorderPoints(borderPixels);
 }
 
 function orderBorderPoints(borderPoints) {
@@ -1204,7 +1269,7 @@ function clearCanvas() {
 }
 
 function drawPointSymmetry(sym, color, alpha, verbose) {
-  drawCtx.globalAlpha = alpha;
+	drawCtx.globalAlpha = alpha;
 	drawCtx.linewidth = 1;
 	drawCtx.strokeStyle = color;
 	drawCtx.setLineDash([]);
@@ -1215,11 +1280,17 @@ function drawPointSymmetry(sym, color, alpha, verbose) {
 		// drawCtx.fillStyle = 'black';
 		// drawCtx.fillText(Math.round(sym.point1[0])+','+Math.round(sym.point1[1]), sym.point1[0]+rotationControlPointRadius, sym.point1[1]-rotationControlPointRadius);
 	}
-  drawCtx.globalAlpha = 1.0;
+	drawCtx.globalAlpha = 1.0;
 }
-
+function drawSpiralSymmetry(sym, color, alpha, verbose) {
+	drawRotationalSymmetry(sym, color, alpha, verbose);
+	drawScaleSymmetry(sym, color, alpha, verbose);
+}
+function drawGlideSymmetry(sym, color, alpha, verbose) {
+	drawLineSymmetry(sym, color, alpha, verbose);
+}
 function drawRotationalSymmetry(sym, color, alpha, verbose) {
-  drawCtx.globalAlpha = alpha;
+	drawCtx.globalAlpha = alpha;
 	drawCtx.linewidth = 1;
 	drawCtx.strokeStyle = color;
 	drawCtx.setLineDash([]);
@@ -1245,7 +1316,7 @@ function drawRotationalSymmetry(sym, color, alpha, verbose) {
 		// drawCtx.fillText(Math.round(sym.point1[0])+','+Math.round(sym.point1[1]), sym.point1[0]+rotationControlPointRadius, sym.point1[1]-rotationControlPointRadius);
 		// drawCtx.fillText('x'+sym.order, sym.point1[0]+rotationControlPointRadius, sym.point1[1]+rotationControlPointRadius);
 	}
-  drawCtx.globalAlpha = 1.0;
+	drawCtx.globalAlpha = 1.0;
 }
 
 const rotationControlPointRadius = 5;
@@ -1263,7 +1334,7 @@ function drawLineSymmetry(sym, color, alpha, verbose) {
 	if (point2 == null) {
 		point2 = getTempPoint2(point1);
 	}
-  drawCtx.globalAlpha = alpha;
+	drawCtx.globalAlpha = alpha;
 	var dx = point2[0] - point1[0];
 	var dy = point2[1] - point1[1];
 	var yIntercept0 = point1[1] - (point1[0] - 0) * dy / dx;
@@ -1284,7 +1355,7 @@ function drawLineSymmetry(sym, color, alpha, verbose) {
 	if (verbose) {
 
 	}
-  drawCtx.globalAlpha = 1.0;
+	drawCtx.globalAlpha = 1.0;
 }
 
 function drawTranslationalSymmetry(sym, color, alpha, verbose) {
@@ -1293,7 +1364,7 @@ function drawTranslationalSymmetry(sym, color, alpha, verbose) {
 	if (point2 == null) {
 		point2 = [point1[0]+10, point1[1]];
 	}
-  drawCtx.globalAlpha = alpha;
+	drawCtx.globalAlpha = alpha;
 	drawCtx.linewidth = 1;
 	drawCtx.strokeStyle = color;
 	drawCtx.setLineDash([2, 2]);
@@ -1325,7 +1396,7 @@ function drawTranslationalSymmetry(sym, color, alpha, verbose) {
 	if (verbose) {
 
 	}
-  drawCtx.globalAlpha = 1.0;
+	drawCtx.globalAlpha = 1.0;
 }
 
 function drawScaleSymmetry(sym, color, alpha, verbose) {
@@ -1334,7 +1405,7 @@ function drawScaleSymmetry(sym, color, alpha, verbose) {
 	if (point2 == null) {
 		point2 = getTempPoint2(point1);
 	}
-  drawCtx.globalAlpha = alpha;
+	drawCtx.globalAlpha = alpha;
 	drawCtx.linewidth = 1;
 	drawCtx.strokeStyle = color;
 	drawCtx.setLineDash([]);
@@ -1375,7 +1446,7 @@ function drawScaleSymmetry(sym, color, alpha, verbose) {
 	if (verbose) {
 
 	}
-  drawCtx.globalAlpha = 1.0;
+	drawCtx.globalAlpha = 1.0;
 }
 
 function updateCanvas() {
@@ -1402,7 +1473,7 @@ function updateCanvas() {
 				if (isNaN(traceX[traceNum][k]) || k + 1 == traceX[traceNum].length || traceC[traceNum][k] != currentColor) {
 					if (isNaN(traceX[traceNum][k])) {
 						startNewSegment = true;
-//						drawCtx.moveTo(traceX[traceNum][k], traceY[traceNum][k]);
+						//						drawCtx.moveTo(traceX[traceNum][k], traceY[traceNum][k]);
 					}
 					drawCtx.strokeStyle = currentColor;
 					drawCtx.stroke();
@@ -1421,13 +1492,13 @@ function updateCanvas() {
 		drawCtx.globalAlpha = 1.0;
 
 	}
-    var symmetriesToDraw = [];
-    if (showSymmetries) {
-         symmetriesToDraw = symmetries.slice();
-    }
-    if (temporarySymmetry != undefined) {
-        symmetriesToDraw = symmetriesToDraw.concat([temporarySymmetry]);
-    }
+	var symmetriesToDraw = [];
+	if (showSymmetries) {
+		symmetriesToDraw = symmetries.slice();
+	}
+	if (temporarySymmetry != undefined) {
+		symmetriesToDraw = symmetriesToDraw.concat([temporarySymmetry]);
+	}
 
 	if (showSymmetries || temporarySymmetry != undefined) {
 		var alpha;
@@ -1451,19 +1522,25 @@ function updateCanvas() {
 					// Draw nothing
 					break;
 				case "point":
-          drawPointSymmetry(symmetriesToDraw[k], color, alpha, verbose)
+					drawPointSymmetry(symmetriesToDraw[k], color, alpha, verbose);
 					break;
 				case "line":
-          drawLineSymmetry(symmetriesToDraw[k], color, alpha, verbose)
+					drawLineSymmetry(symmetriesToDraw[k], color, alpha, verbose);
 					break;
 				case "rotation":
-          drawRotationalSymmetry(symmetriesToDraw[k], color, alpha, verbose)
+					drawRotationalSymmetry(symmetriesToDraw[k], color, alpha, verbose);
 					break;
 				case "translation":
-          drawTranslationalSymmetry(symmetriesToDraw[k], color, alpha, verbose)
+					drawTranslationalSymmetry(symmetriesToDraw[k], color, alpha, verbose);
 					break;
 				case "scale":
-          drawScaleSymmetry(symmetriesToDraw[k], color, alpha, verbose)
+					drawScaleSymmetry(symmetriesToDraw[k], color, alpha, verbose);
+					break;
+				case "spiral":
+					drawSpiralSymmetry(symmetriesToDraw[k], color, alpha, verbose);
+					break;
+				case "glide":
+					drawGlideSymmetry(symmetriesToDraw[k], color, alpha, verbose);
 					break;
 				default:
 					console.log("Error, invalid symmetry type");
