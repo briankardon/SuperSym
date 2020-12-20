@@ -1312,12 +1312,56 @@ function drawPointSymmetry(sym, color, alpha, verbose) {
 	drawCtx.globalAlpha = 1.0;
 }
 function drawSpiralSymmetry(sym, color, alpha, verbose) {
-	drawRotationalSymmetry(sym, color, alpha, verbose);
+	// drawRotationalSymmetry(sym, color, alpha, verbose);
 	drawScaleSymmetry(sym, color, alpha, verbose);
+	drawRadiatingArcs(sym.point1[0], sym.point1[1], sym.order, scaleBaseRadius, [2, 8]);
 }
 function drawGlideSymmetry(sym, color, alpha, verbose) {
-	drawLineSymmetry(sym, color, alpha, verbose);
+	let point1 = sym.point1;
+	let point2 = sym.point2;
+	if (point2 == null) {
+		point2 = getTempPoint2(point1);
+	}
+	let dash = [4, 4];
+	let lineWidth = 1;
+	drawCtx.globalAlpha = alpha;
+	drawFullLine(point1[0], point1[1], point2[0], point2[1], color, dash, lineWidth);
+	// Draw control points
+	drawCtx.beginPath();
+	drawCtx.setLineDash([])
+	drawArrowHead(point1[0], point1[1], point2[0]-point1[0], point2[1]-point1[1], 9, [], color, lineWidth);
+	drawArrowHead(point2[0], point2[1], point2[0]-point1[0], point2[1]-point1[1], 9, [], color, lineWidth);
+	if (verbose) {
+
+	}
+	drawCtx.globalAlpha = 1.0;
 }
+
+function drawArrowHead(x, y, dx, dy, length, dash, color, lineWidth) {
+	// Draws an arrowhead at (x, y) with sides of the given length pointing in a direction defined by the deltas dx and dy
+	// Convert dx/dy to unit vector
+	let d = Math.sqrt(dx*dx+dy*dy);
+	dx = dx*length/d;
+	dy = dy*length/d;
+	// Rotate
+	let angle = 55; // in degrees
+	let c = Math.cos((180 - angle/2) * Math.PI/180);
+	let s = Math.sin((180 - angle/2) * Math.PI/180);
+	let dxL = dx * c - dy * s;
+	let dyL = dx * s + dy * c;
+	let dxR = dx * c + dy * s;
+	let dyR = -dx * s + dy * c;
+	drawCtx.setLineDash(dash);
+	drawCtx.strokeStyle = color;
+	drawCtx.linewidth = lineWidth;
+	drawCtx.beginPath();
+	drawCtx.moveTo(x, y);
+	drawCtx.lineTo(x + dxL, y + dyL);
+	drawCtx.moveTo(x, y);
+	drawCtx.lineTo(x + dxR, y + dyR);
+	drawCtx.stroke();
+}
+
 function drawRotationalSymmetry(sym, color, alpha, verbose) {
 	drawCtx.globalAlpha = alpha;
 	drawCtx.linewidth = 1;
@@ -1330,16 +1374,7 @@ function drawRotationalSymmetry(sym, color, alpha, verbose) {
 	drawCtx.stroke()
 
 	// Draw radiating arms
-	drawCtx.beginPath();
-	drawCtx.setLineDash([2, 8])
-	var canvasDiag = Math.sqrt(drawCanvas.width**2 + drawCanvas.height**2);
-	var angle;
-	for (var j = 0; j < sym.order; j++) {
-		angle = 2*Math.PI * j / sym.order;
-		drawCtx.moveTo(sym.point1[0], sym.point1[1]);
-		drawCtx.lineTo(sym.point1[0] + Math.cos(angle)*canvasDiag, sym.point1[1] + Math.sin(angle)*canvasDiag);
-	}
-	drawCtx.stroke();
+	drawRadiatingArcs(sym.point1[0], sym.point1[1], sym.order, 0, [2, 8]);
 	if (verbose) {
 		// drawCtx.fillStyle = 'black';
 		// drawCtx.fillText(Math.round(sym.point1[0])+','+Math.round(sym.point1[1]), sym.point1[0]+rotationControlPointRadius, sym.point1[1]-rotationControlPointRadius);
@@ -1347,6 +1382,20 @@ function drawRotationalSymmetry(sym, color, alpha, verbose) {
 	}
 	drawCtx.globalAlpha = 1.0;
 }
+
+function drawRadiatingArcs(x, y, order, startRadius, dash) {
+	drawCtx.beginPath();
+	drawCtx.setLineDash(dash)
+	var canvasDiag = Math.sqrt(drawCanvas.width**2 + drawCanvas.height**2);
+	var angle;
+	for (var j = 0; j < order; j++) {
+		angle = 2*Math.PI * j / order;
+		drawCtx.moveTo(x + Math.cos(angle)*startRadius, y + Math.sin(angle)*startRadius);
+		drawCtx.lineTo(x + Math.cos(angle)*canvasDiag, y + Math.sin(angle)*canvasDiag);
+	}
+	drawCtx.stroke();
+}
+
 
 const rotationControlPointRadius = 5;
 const lineControlPointWidth = 8;
@@ -1363,18 +1412,10 @@ function drawLineSymmetry(sym, color, alpha, verbose) {
 	if (point2 == null) {
 		point2 = getTempPoint2(point1);
 	}
+	let dash = [4, 4];
+	let lineWidth = 1;
 	drawCtx.globalAlpha = alpha;
-	var dx = point2[0] - point1[0];
-	var dy = point2[1] - point1[1];
-	var yIntercept0 = point1[1] - (point1[0] - 0) * dy / dx;
-	var yIntercept1 = point1[1] - (point1[0] - drawCanvas.width) * dy / dx;
-	drawCtx.linewidth = 1;
-	drawCtx.strokeStyle = color;
-	drawCtx.setLineDash([4, 4])
-	drawCtx.beginPath();
-	drawCtx.moveTo(0, yIntercept0);
-	drawCtx.lineTo(drawCanvas.width, yIntercept1);
-	drawCtx.stroke();
+	drawFullLine(point1[0], point1[1], point2[0], point2[1], color, dash, lineWidth);
 	// Draw control points
 	drawCtx.beginPath();
 	drawCtx.setLineDash([])
@@ -1385,6 +1426,20 @@ function drawLineSymmetry(sym, color, alpha, verbose) {
 
 	}
 	drawCtx.globalAlpha = 1.0;
+}
+
+function drawFullLine(x1, y1, x2, y2, color, dash, lineWidth) {
+	let dx = x2 - x1;
+	let dy = y2 - y1;
+	let yIntercept0 = y1 - x1 * dy / dx;
+	let yIntercept1 = y1 - (x1 - drawCanvas.width) * dy / dx;
+	drawCtx.linewidth = lineWidth;
+	drawCtx.strokeStyle = color;
+	drawCtx.setLineDash(dash)
+	drawCtx.beginPath();
+	drawCtx.moveTo(0, yIntercept0);
+	drawCtx.lineTo(drawCanvas.width, yIntercept1);
+	drawCtx.stroke();
 }
 
 function drawTranslationalSymmetry(sym, color, alpha, verbose) {
@@ -1489,17 +1544,19 @@ function updateCanvas() {
 		drawCtx.globalAlpha = getDrawTransparency();
 
 		var currentColor;
-		var startNewSegment = true;
+		var startNewSegment = false;
 
 		drawCtx.lineWidth = 1;
 		drawCtx.strokeStyle = currentColor;
 		drawCtx.setLineDash([]);
 
+		console.log(JSON.parse(JSON.stringify(traceX)));
+
 		drawCtx.beginPath();
 		for (var traceNum = 0; traceNum < traceX.length; traceNum++) {
 			drawCtx.moveTo(traceX[traceNum][0], traceY[traceNum][0]);
 			for (var k = 1; k < traceX[traceNum].length; k++){
-				if (isNaN(traceX[traceNum][k]) || k + 1 == traceX[traceNum].length || traceC[traceNum][k] != currentColor) {
+				if (isNaN(traceX[traceNum][k]) || k == traceX[traceNum].length - 1 || traceC[traceNum][k] != currentColor) {
 					if (isNaN(traceX[traceNum][k])) {
 						startNewSegment = true;
 						//						drawCtx.moveTo(traceX[traceNum][k], traceY[traceNum][k]);
