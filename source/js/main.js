@@ -40,13 +40,13 @@ $(document).keyup(function(e) {
 		case 'r':
 			setSymmetryType("rotation")
 			break;
-		case 'R':
+		case 'i':
 			setSymmetryType("spiral");
 			break;
 		case 'l':
 			setSymmetryType("line")
 			break;
-		case 'L':
+		case 'g':
 			setSymmetryType('glide');
 			break;
 		case 't':
@@ -95,7 +95,7 @@ $(document).keyup(function(e) {
 function setSymmetryType(type) {
 	mode = 'editSymmetries';
 	$("#editSymmetries").prop("checked", true);
-	$("#"+type).prop("checked", true);
+	$("#symmetryType").val(type);
 	if (lastMouseX != undefined && lastMouseY != undefined) {
 		temporarySymmetry = createSpecifiedSymmetry([lastMouseX, lastMouseY]);
 		updateCanvas();
@@ -535,7 +535,7 @@ function updateMode() {
 }
 
 function getSelectedSymmetryType() {
-	return $('input[name="symmetryType"]:checked').val();
+	return $('#symmetryType').val();
 }
 
 function getSelectedSymmetryLevel() {
@@ -719,24 +719,8 @@ function getCanvasCoords(evt, isTouch) {
 	return [x, y];
 }
 
-function getRotNum() {
-	return $("#rotNum").val();
-}
-
-function getTransNum() {
-	return $("#transNum").val();
-}
-
-function getScaleNum() {
-	return $('#scaleNum').val();
-}
-
-function getSpiralNum() {
-	return $('#spiralNum').val();
-}
-
-function getGlideNum() {
-	return $('#glideNum').val();
+function getSymmetryOrder() {
+	return $("#symmetryOrder").val();
 }
 
 var rainbowHue = 0;
@@ -1015,16 +999,16 @@ function createSpecifiedSymmetry(point1, point2) {
 	var point2 = point2;
 	var order;
 	if (type == "rotation") {
-		order = parseInt(getRotNum());
+		order = parseInt(getSymmetryOrder());
 	} else if (type == "translation") {
-		order = parseInt(getTransNum());
+		order = parseInt(getSymmetryOrder());
 	} else if (type == "scale") {
-		order = parseInt(getScaleNum());
+		order = parseInt(getSymmetryOrder());
 	} else if (type == "line") {
 	} else if (type == "spiral") {
-		order = parseInt(getSpiralNum());
+		order = parseInt(getSymmetryOrder());
 	} else if (type == "glide") {
-		order = parseInt(getGlideNum());
+		order = parseInt(getSymmetryOrder());
 	}
 	return new symmetry(type, level, point1, point2, order);
 }
@@ -1081,6 +1065,8 @@ function updateCanvasSize() {
 // 	when the mouse starts moving. I couldn't get an accurate
 //	canvas width without waiting for user mouse movement.
 var firstCanvasWidthUpdate = true;
+
+var lastSymmetryOrders = {};
 
 $(function () {
 	drawCanvas = document.getElementById("drawCanvas");
@@ -1141,35 +1127,78 @@ $(function () {
 		selectionPalette: []
 	});
 
+	// Pre-populate lastSymmetryOrders
+	lastSymmetryOrders.point = 0;
+	lastSymmetryOrders.line = 0;
+	lastSymmetryOrders.rotation = 7;
+	lastSymmetryOrders.scale = 5;
+	lastSymmetryOrders.translation = 7;
+	lastSymmetryOrders.glide = 7;
+	lastSymmetryOrders.spiral = 7;
+
 	//Setup event callbacks:
-	$("input[name=symmetryType]").on('click touchstart',
-	function(){
-		setModeIndicator("editSymmetries");
-	}
-);
-$("#drawCanvas").on('mousedown touchstart',
-function (evt) {
-	if (mode == "draw" && evt.shiftKey) {
-		restartFromLast();
-	}
-});
+	$("#symmetryType").on(
+		'change',
+		function() {
+			setModeIndicator("editSymmetries");
+			let type = getSelectedSymmetryType();
+			// Hide symmetry order for symmetry types that don't have an order
+			switch (type) {
+				case 'line':
+				case 'point':
+					$("#symmetryOrder").css(
+						'visibility',
+						'hidden'
+					)
+					break;
+				default:
+					$("#symmetryOrder").css(
+						'visibility',
+						'visible'
+					)
+					break;
+			}
+			$('#symmetryOrder').val(lastSymmetryOrders[type]);
+		}
+	);
+	// Trigger change callback
+	$("#symmetryType").change();
 
-$("#drawCanvas").on('click', clickHandler);
-$("#drawCanvas").on('touchstart', touchstartHandler);
+	$('#symmetryOrder').on(
+		'click touchstart',
+		function () {
+			setModeIndicator("editSymmetries");
+			let type = getSelectedSymmetryType();
+			lastSymmetryOrders[type] = getSymmetryOrder();
+		}
+	);
+	$("#drawCanvas").on(
+		'mousedown touchstart',
+		function (evt) {
+			if (mode == "draw" && evt.shiftKey) {
+				restartFromLast();
+			}
+		}
+	);
 
-$("#symmetryTransparency").val(0.3);
-$("#drawTransparency").val(1.0);
+	$("#drawCanvas").on('click', clickHandler);
+	$("#drawCanvas").on('touchstart', touchstartHandler);
+
+	$("#symmetryTransparency").val(0.3);
+	$("#drawTransparency").val(1.0);
 
 
-$("#drawCanvas").on('mouseout', mouseoutHandler);
-$("#drawCanvas").on('touchend', touchendHandler);
-$("#drawCanvas").on('mousemove', mousemoveHandler);
-$("#drawCanvas").on('touchmove', touchmoveHandler);
-$("#symmetryTransparency").on('change', updateCanvas)
-$("#drawTransparency").on('change', updateCanvas)
+	$("#drawCanvas").on('mouseout', mouseoutHandler);
+	$("#drawCanvas").on('touchend', touchendHandler);
+	$("#drawCanvas").on('mousemove', mousemoveHandler);
+	$("#drawCanvas").on('touchmove', touchmoveHandler);
+	$("#symmetryTransparency").on('change', updateCanvas)
+	$("#drawTransparency").on('change', updateCanvas)
 
-// Set version number
-$("#footer").html($('#footer').html()+'1.10')
+	// Set version number
+	$("#footer").html($('#footer').html()+'1.10')
+
+	setModeIndicator("draw");
 });
 
 function flatCoord(x, y, numPerPixel) {
