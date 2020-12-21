@@ -419,13 +419,15 @@ class symmetry {
 				}
 				break;
 			case "spiral":
-				var angle = 2*Math.PI / this.order;
-				var scaleFactor = Math.sqrt((this.point2[0]-this.point1[0])**2 + (this.point2[1]-this.point1[1])**2)/scaleBaseRadius
-				for (let s = 0; s < this.order; s++) {
-					[newX, newY] = rotate(x, y, this.point1[0], this.point1[1], angle*(s+1));
-					[newX, newY] = scale(newX, newY, this.point1[0], this.point1[1], (scaleFactor**(s+1)));
-					newXs[s] = newX;
-					newYs[s] = newY;
+				if (this.point2 != null && this.point1 != null) {
+					var angle = 2*Math.PI / this.order;
+					var scaleFactor = Math.sqrt((this.point2[0]-this.point1[0])**2 + (this.point2[1]-this.point1[1])**2)/scaleBaseRadius
+					for (let s = 0; s < this.order; s++) {
+						[newX, newY] = rotate(x, y, this.point1[0], this.point1[1], angle*(s+1));
+						[newX, newY] = scale(newX, newY, this.point1[0], this.point1[1], (scaleFactor**(s+1)));
+						newXs[s] = newX;
+						newYs[s] = newY;
+					}
 				}
 				break;
 			default:
@@ -1198,7 +1200,6 @@ $(function () {
 	// Set version number
 	var version = '1.11';
 	$("#footer").html($('#footer').html()+version);
-	$("#mainjs").attr("src", $("#mainjs").attr("src") + "?"+version);
 
 	setModeIndicator("draw");
 });
