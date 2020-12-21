@@ -1,9 +1,6 @@
 ``// TODO
 //  Finish fill mode
-//  When creating a 2-point symmetry, have mouseout end (cancel?) the symmetry
 //  Have help text appear when selecting each mode/option
-//  Add ability to click and drag symmetries
-//  Add abiity to delete individual symmetries
 
 //Keyboard shortcuts:
 $(document).keyup(function(e) {
