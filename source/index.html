@@ -6,7 +6,7 @@
 	<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css">
 	<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
   <script src='js/spectrum.js'></script>
-	<script src="js/main.js"></script>
+	<script id="mainjs" src="js/main.js?1.11"></script>
 	<link href='https://fonts.googleapis.com/css?family=Raleway:400,300,600' rel='stylesheet' type='text/css'>
 	<link rel="stylesheet" href="css/normalize.css">
   <link rel="stylesheet" href="css/skeleton.css">
@@ -167,6 +167,8 @@
 			<li>A <strong>line symmetry</strong> keeps your drawing the same when flipped over a line</li>
 			<li>A <strong>translational symmetry</strong> keeps your drawing the same when moved by a particular amount in a particular direction. Ok, technically that would only be true if it translated it an infinite number of times. Instead, you can pick the "order" of the translation, which determins how many times your drawing is repeated.</li>
 			<li>A <strong>scale symmetry</strong> keeps your drawing the same when scaled up or down with respect to a point. You can pick the "order" of the scale, which determins how many times your drawing is scaled.</li>
+			<li>A <strong>spiral symmetry</strong> keeps your drawing the same when simultaneously scaling and rotating it. It's basically a combination scale/rotation symmetry.</li>
+			<li>A <strong>glide symmetry</strong> keeps your drawing the same when simultaneously reflected across a line and translated. It's basically a combination line/translation symmetry.</li>
 		</ul>
 		<h4>What does the "Symmetry iteration order" button do?</h4>
 		<p>The symmetry iteration order determines, for the next symmetry you place, the order in which your drawing is "symmetrized".</p>

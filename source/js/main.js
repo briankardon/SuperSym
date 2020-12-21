@@ -1196,7 +1196,9 @@ $(function () {
 	$("#drawTransparency").on('change', updateCanvas)
 
 	// Set version number
-	$("#footer").html($('#footer').html()+'1.10')
+	var version = '1.11';
+	$("#footer").html($('#footer').html()+version);
+	$("#mainjs").attr("src", $("#mainjs").attr("src") + "?"+version);
 
 	setModeIndicator("draw");
 });
@@ -1551,8 +1553,6 @@ function updateCanvas() {
 		drawCtx.lineWidth = 1;
 		drawCtx.strokeStyle = currentColor;
 		drawCtx.setLineDash([]);
-
-		console.log(JSON.parse(JSON.stringify(traceX)));
 
 		drawCtx.beginPath();
 		for (var traceNum = 0; traceNum < traceX.length; traceNum++) {
