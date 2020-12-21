@@ -1,0 +1,4 @@
+SuperSym - a symmetry-based doodling tool: https://supersym.briankardon.net
+
+Demo: https://youtu.be/DCchF3EStoI
+How to: https://youtu.be/k3F10Ch_YiI
