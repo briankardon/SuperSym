@@ -8,6 +8,7 @@ $(document).keyup(function(e) {
 		case 'Escape':
 			modal.style.display = "none";
 			temporarySymmetry = null;
+			hoverSymmetryIndex = null;
 			mode = "draw";
 			$("#draw").prop("checked", true);
 			updateCanvas();
@@ -419,7 +420,8 @@ class symmetry {
 				if (this.point2 != null && this.point1 != null) {
 					var angle = 2*Math.PI / this.order;
 					var scaleFactor = Math.sqrt((this.point2[0]-this.point1[0])**2 + (this.point2[1]-this.point1[1])**2)/scaleBaseRadius
-					for (let s = 0; s < this.order; s++) {
+					let order = Math.abs(this.order);
+					for (let s = 0; s < order; s++) {
 						[newX, newY] = rotate(x, y, this.point1[0], this.point1[1], angle*(s+1));
 						[newX, newY] = scale(newX, newY, this.point1[0], this.point1[1], (scaleFactor**(s+1)));
 						newXs[s] = newX;
@@ -1392,7 +1394,7 @@ function drawRadiatingArcs(x, y, order, startRadius, dash) {
 	drawCtx.setLineDash(dash)
 	var canvasDiag = Math.sqrt(drawCanvas.width**2 + drawCanvas.height**2);
 	var angle;
-	for (var j = 0; j < order; j++) {
+	for (var j = 0; j < Math.abs(order); j++) {
 		angle = 2*Math.PI * j / order;
 		drawCtx.moveTo(x + Math.cos(angle)*startRadius, y + Math.sin(angle)*startRadius);
 		drawCtx.lineTo(x + Math.cos(angle)*canvasDiag, y + Math.sin(angle)*canvasDiag);
