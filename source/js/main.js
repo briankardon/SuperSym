@@ -54,7 +54,7 @@ $(document).keyup(function(e) {
 			setSymmetryType("scale")
 			break;
 		case '?':
-			$("#shortcutKeyDialog").dialog("open");
+			openShortcutKeyDialog();
 			break;
 		case 'z':
 			if (e.metaKey || e.ctrlKey) {
@@ -89,6 +89,10 @@ $(document).keyup(function(e) {
 			break;
 	}
 });
+
+function openShortcutKeyDialog() {
+	$("#shortcutKeyDialog").dialog("open");
+}
 
 function setSymmetryType(type) {
 	mode = 'editSymmetries';
@@ -127,6 +131,7 @@ function setUpModal() {
 	FAQlink.onclick = function() {
 		modal.style.display = "block";
 	}
+	$("#hotkeyLink").on('click', openShortcutKeyDialog);
 	// When the user clicks on <span> (x), close the modal
 	closeButton.onclick = function() {
 		modal.style.display = "none";
@@ -1050,7 +1055,8 @@ function addPredefinedSymmetryConfigurations() {
 		"1rot6_2rot17_3scl7":"%5B%7B%22type%22:%22identity%22,%22level%22:null,%22point1%22:null,%22point2%22:null,%22order%22:0%7D,%7B%22type%22:%22rotation%22,%22level%22:1,%22point1%22:%5B694,268%5D,%22order%22:6%7D,%7B%22type%22:%22rotation%22,%22level%22:3,%22point1%22:%5B885,268%5D,%22order%22:17%7D,%7B%22type%22:%22scale%22,%22level%22:4,%22point1%22:%5B885,269%5D,%22point2%22:%5B905,253%5D,%22order%22:7%7D%5D",
 		"1spi18_2rot6":"%5B%7B%22type%22:%22identity%22,%22level%22:null,%22point1%22:null,%22point2%22:null,%22order%22:0%7D,%7B%22type%22:%22spiral%22,%22level%22:1,%22point1%22:%5B448,274%5D,%22point2%22:%5B458,242%5D,%22order%22:18%7D,%7B%22type%22:%22rotation%22,%22level%22:2,%22point1%22:%5B547,273%5D,%22order%22:6%7D%5D",
 		"1spi18_2rot6_3spi18_4rot6":"%5B%7B%22type%22:%22identity%22,%22level%22:null,%22point1%22:null,%22point2%22:null,%22order%22:0%7D,%7B%22type%22:%22spiral%22,%22level%22:1,%22point1%22:%5B531,272%5D,%22point2%22:%5B543,240%5D,%22order%22:18%7D,%7B%22type%22:%22rotation%22,%22level%22:2,%22point1%22:%5B530,272%5D,%22order%22:6%7D,%7B%22type%22:%22spiral%22,%22level%22:3,%22point1%22:%5B734,271%5D,%22point2%22:%5B745,239%5D,%22order%22:18%7D,%7B%22type%22:%22rotation%22,%22level%22:4,%22point1%22:%5B733,270%5D,%22order%22:5%7D%5D",
-		"1rot3_2trans7x2_3trans7x2","%5B%7B%22type%22:%22identity%22,%22level%22:null,%22point1%22:null,%22point2%22:null,%22order%22:0%7D,%7B%22type%22:%22rotation%22,%22level%22:1,%22point1%22:%5B580,291%5D,%22order%22:3%7D,%7B%22type%22:%22translation%22,%22level%22:2,%22point1%22:%5B579,290%5D,%22point2%22:%5B681,290%5D,%22order%22:7%7D,%7B%22type%22:%22translation%22,%22level%22:2,%22point1%22:%5B681,290%5D,%22point2%22:%5B580,290%5D,%22order%22:7%7D,%7B%22type%22:%22translation%22,%22level%22:3,%22point1%22:%5B579,290%5D,%22point2%22:%5B529,201%5D,%22order%22:7%7D,%7B%22type%22:%22translation%22,%22level%22:3,%22point1%22:%5B528,201%5D,%22point2%22:%5B579,290%5D,%22order%22:7%7D%5D"
+		"1rot3_2trans7x2_3trans7x2":"%5B%7B%22type%22:%22identity%22,%22level%22:null,%22point1%22:null,%22point2%22:null,%22order%22:0%7D,%7B%22type%22:%22rotation%22,%22level%22:1,%22point1%22:%5B580,291%5D,%22order%22:3%7D,%7B%22type%22:%22translation%22,%22level%22:2,%22point1%22:%5B579,290%5D,%22point2%22:%5B681,290%5D,%22order%22:7%7D,%7B%22type%22:%22translation%22,%22level%22:2,%22point1%22:%5B681,290%5D,%22point2%22:%5B580,290%5D,%22order%22:7%7D,%7B%22type%22:%22translation%22,%22level%22:3,%22point1%22:%5B579,290%5D,%22point2%22:%5B529,201%5D,%22order%22:7%7D,%7B%22type%22:%22translation%22,%22level%22:3,%22point1%22:%5B528,201%5D,%22point2%22:%5B579,290%5D,%22order%22:7%7D%5D",
+		"1line_2rot3_3trans7x2_4trans7x2":"%5B%7B%22type%22:%22identity%22,%22level%22:null,%22point1%22:null,%22point2%22:null,%22order%22:0%7D,%7B%22type%22:%22line%22,%22level%22:1,%22point1%22:%5B579,291%5D,%22point2%22:%5B684,290%5D,%22order%22:2%7D,%7B%22type%22:%22rotation%22,%22level%22:2,%22point1%22:%5B580,291%5D,%22order%22:3%7D,%7B%22type%22:%22translation%22,%22level%22:3,%22point1%22:%5B579,290%5D,%22point2%22:%5B681,290%5D,%22order%22:7%7D,%7B%22type%22:%22translation%22,%22level%22:3,%22point1%22:%5B681,290%5D,%22point2%22:%5B580,290%5D,%22order%22:7%7D,%7B%22type%22:%22translation%22,%22level%22:4,%22point1%22:%5B579,290%5D,%22point2%22:%5B529,201%5D,%22order%22:7%7D,%7B%22type%22:%22translation%22,%22level%22:4,%22point1%22:%5B528,201%5D,%22point2%22:%5B579,290%5D,%22order%22:7%7D%5D"
 	};
 	for (const [name, value] of Object.entries(configs)) {
 		let newOption = `<option class="toolBarSubElement" value=${value}>${name}</option>`;
@@ -1200,7 +1206,7 @@ $(function () {
 	$("#drawTransparency").on('change', updateCanvas)
 
 	// Set version number
-	var version = '1.13';
+	var version = '1.14';
 	$("#footer").html($('#footer').html()+version);
 
 	setModeIndicator("draw");

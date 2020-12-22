@@ -6,7 +6,7 @@
 	<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css">
 	<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
   <script src='js/spectrum.js'></script>
-	<script id="mainjs" src="js/main.js?1.13"></script>
+	<script id="mainjs" src="js/main.js?1.14"></script>
 	<link href='https://fonts.googleapis.com/css?family=Raleway:400,300,600' rel='stylesheet' type='text/css'>
 	<link rel="stylesheet" href="css/normalize.css">
   <link rel="stylesheet" href="css/skeleton.css">
@@ -24,15 +24,15 @@
 
 		<fieldset class="toolBarElement">
 			<label for="" class="toolBarSubElementHeader">Clear</label>
-			<div><button id="clearDrawing" class="toolBarSubElement clearer" onclick="clearDrawing()">Drawing</button></div>
-			<div><button id="clearSymmetries" class="toolBarSubElement clearer" onclick="clearSymmetries()">Symmetries</button></div>
+			<div><button id="clearDrawing" title="hotkey: c" class="toolBarSubElement clearer" onclick="clearDrawing()">Drawing</button></div>
+			<div><button id="clearSymmetries" title="hotkey: shift-c" class="toolBarSubElement clearer" onclick="clearSymmetries()">Symmetries</button></div>
 		</fieldset>
 
 		<fieldset class="toolBarElement">
 			<label for="" class="toolBarSubElementHeader">Mode:</label>
 			<label for="draw">
-					<input type="radio" class="toolBarSubElement"  id="draw" name="Mode" value="draw" onclick="updateMode()" checked>
-					<span class="toolBarSubElement">Draw</span>
+					<input type="radio" title="hotkey: d" class="toolBarSubElement"  id="draw" name="Mode" value="draw" onclick="updateMode()" checked>
+					<span class="toolBarSubElement" title="hotkey: d">Draw</span>
 			</label>
 
 			<!--<div class="radioInputWrapper">
@@ -43,8 +43,8 @@
 			</div>-->
 
 			<label for="editSymmetries">
-				<input type="radio" class="toolBarSubElement" id="editSymmetries" name="Mode" value="editSymmetries" onclick="updateMode()">
-				<span class="toolBarSubElement">Edit sym.</span>
+				<input type="radio" title="hotkey: e" class="toolBarSubElement" id="editSymmetries" name="Mode" value="editSymmetries" onclick="updateMode()">
+				<span class="toolBarSubElement" title="hotkey: e">Edit sym.</span>
 			</label>
 		</fieldset>
 
@@ -52,13 +52,13 @@
 			<label for="" class="toolBarSubElementHeader">Symmetry type:</label>
 
 			<select class="toolBarSubElement" name="symmetryType" id="symmetryType" width="8">
-				<option class="toolBarSubElement" value="point" selected>point</option>
-				<option class="toolBarSubElement" value="rotation">rotation</option>
-				<option class="toolBarSubElement" value="line">line</option>
-				<option class="toolBarSubElement" value="translation">translation</option>
-				<option class="toolBarSubElement" value="scale">scale</option>
-				<option class="toolBarSubElement" value="spiral">spiral</option>
-				<option class="toolBarSubElement" value="glide">glide</option>
+				<option class="toolBarSubElement" title="hotkey: p" value="point" selected>point</option>
+				<option class="toolBarSubElement" title="hotkey: r" value="rotation">rotation</option>
+				<option class="toolBarSubElement" title="hotkey: l" value="line">line</option>
+				<option class="toolBarSubElement" title="hotkey: t" value="translation">translation</option>
+				<option class="toolBarSubElement" title="hotkey: s" value="scale">scale</option>
+				<option class="toolBarSubElement" title="hotkey: p" value="spiral">spiral</option>
+				<option class="toolBarSubElement" title="hotkey: g" value="glide">glide</option>
 			</select>
 			<input type="number" class="toolBarSubElement" id="symmetryOrder" name="symmetryOrder" step="1" min="1" max="64" value=7>
 
@@ -124,6 +124,9 @@
 		</fieldset>
 
 		<a class="toolBarElement" id="FAQLink" href="#">FAQ</a>
+
+		<a class="toolBarElement" title="hotkey: ?" id="hotkeyLink" href="#">hotkeys</a>
+
 
 	  <a class="icon toolBarElement" href="javascript:void(0);" onClick="openDrawerMenu()">&#9776;</a>
 	  <!--&#9776; is the code for the 3 line menu button-->
