@@ -3,8 +3,25 @@
 //  Have help text appear when selecting each mode/option
 
 //Keyboard shortcuts:
+$(document).keydown(function(e) {
+	switch(e.key) {
+		case 'x':
+			$("#gridSnap").prop('checked', true);
+			gridSnap = true;
+			break;
+		case 'z':
+			if (e.metaKey || e.ctrlKey) {
+				e.preventDefault()
+			}
+			break;
+	}
+});
 $(document).keyup(function(e) {
 	switch(e.key) {
+		case 'x':
+			$("#gridSnap").prop('checked', false);
+			gridSnap = false;
+			break;
 		case 'Escape':
 			modal.style.display = "none";
 			temporarySymmetry = null;
@@ -59,6 +76,7 @@ $(document).keyup(function(e) {
 		case 'z':
 			if (e.metaKey || e.ctrlKey) {
 				undo();
+				e.preventDefault()
 			}
 			break;
 		case 'Shift':
@@ -491,6 +509,11 @@ sortSymmetries(symmetries);
 var scaleBaseRadius = 40;
 var maxColorHistorySize = 5;
 
+var gridSnap;  // Running record of latest user entered grid snap state
+var gridSizeX;  // Running record of latest user entered grid size.
+var gridSizeY;
+var gridType;
+
 function initializeSymmetryList(otherSymmetries) {
 	// Basically just add an identity symmetry to the beginning.
 	if (otherSymmetries == undefined) {
@@ -710,6 +733,24 @@ function rejoinSegment() {
 	}
 }
 
+function snap(x, y) {
+	if (gridSnap) {
+		switch (gridType) {
+			case 'rect':
+				x = Math.round(x/gridSizeX)*gridSizeX;
+				y = Math.round(y/gridSizeY)*gridSizeY;
+				break;
+			case 'hex':
+				y = Math.round(y/gridSizeY);
+				let offset = 0.5 * (y % 2);
+				y = y*gridSizeY;
+				x = (Math.round((x/gridSizeX)-offset)+offset)*gridSizeX;
+				break;
+		}
+	}
+	return [x, y];
+}
+
 function getCanvasCoords(evt, isTouch) {
 	var rect = drawCanvas.getBoundingClientRect();
 	var rawX, rawY;
@@ -722,7 +763,7 @@ function getCanvasCoords(evt, isTouch) {
 	}
 	var x = rawX - rect.left;
 	var y = rawY - rect.top;
-	return [x, y];
+	return snap(x, y);
 }
 
 function getSymmetryOrder() {
@@ -1083,6 +1124,20 @@ $(function () {
 	drawCanvas = document.getElementById("drawCanvas");
 	drawCtx = drawCanvas.getContext('2d');
 
+	$("#gridSnap").on('change', function () {
+		gridSnap = $("#gridSnap").prop('checked');
+	})
+	$("#gridSize").on('change', function () {
+		updateGridSize($("#gridSize").val());
+	});
+	$("#gridType").on('change', function() {
+		gridType = $("#gridType").val();
+		updateGridSize($("#gridSize").val())
+	});
+	$("#gridType").trigger('change');
+	$("#gridSnap").trigger('change');
+	$("#gridSize").trigger('change');
+
 	document.body.addEventListener("touchstart", function (e) {
 		if (e.target == drawCanvas) {
 			e.preventDefault();
@@ -1207,11 +1262,25 @@ $(function () {
 	$("#drawTransparency").on('change', updateCanvas)
 
 	// Set version number
-	var version = '1.14';
+	var version = '1.15';
 	$("#footer").html($('#footer').html()+version);
 
 	setModeIndicator("draw");
 });
+
+function updateGridSize(gridSize) {
+	switch (gridType) {
+		case 'rect':
+			gridSizeX = gridSize;
+			gridSizeY = gridSize;
+			break;
+		case 'hex':
+			gridSizeX = gridSize;
+			gridSizeY = gridSize * Math.sqrt(3)/2;
+			break;
+	}
+}
+
 
 function flatCoord(x, y, numPerPixel) {
 	return Math.round((x + y*drawCanvas.width)*(numPerPixel || 4));

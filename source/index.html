@@ -6,7 +6,7 @@
 	<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css">
 	<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
   <script src='js/spectrum.js'></script>
-	<script id="mainjs" src="js/main.js?1.14"></script>
+	<script id="mainjs" src="js/main.js?1.15"></script>
 	<link href='https://fonts.googleapis.com/css?family=Raleway:400,300,600' rel='stylesheet' type='text/css'>
 	<link rel="stylesheet" href="css/normalize.css">
   <link rel="stylesheet" href="css/skeleton.css">
@@ -68,7 +68,7 @@
 			<label for="" class="toolBarSubElementHeader">Iteration order</label>
 			<label for="symmetryLevel">
 				<span class="toolBarSubElement">Sym. iteration order:</span>
-		    <input type="number" class="toolBarSubElement" id="symmetryLevel" name="symmetryLevel" step="1" value=1 style="width: 80px">
+		    <input type="number" class="toolBarSubElement" id="symmetryLevel" name="symmetryLevel" step="1" value=1>
 			</label>
 			<label for="symmetryLevelAutoIncrement">
 			    <input type="checkbox" class="toolBarSubElement" id="symmetryLevelAutoIncrement" name="symmetryLevelAutoIncrement" checked>
@@ -122,6 +122,27 @@
 				<span class="toolBarSubElement">Rainbow</span>
 			</label> -->
 		</fieldset>
+
+		<fieldset id="gridTools" class="toolBarElement">
+			<label for="" class="toolBarSubElementHeader">Snap to Grid</label>
+			<label for="gridSize">
+				<input type="number" class="toolBarSubElement" id="gridSize" name="gridSize" step="1" min="1" value=10>
+				<span class="toolBarSubElement">Grid size</span>
+			</label>
+			<label for="gridSnap">
+				<input title="hotkey: x (hold down)" type="checkbox" class="toolBarSubElement" id="gridSnap" name="gridSnap">
+				<span title="hotkey: x (hold down)" class="toolBarSubElement">Snap</span>
+			</label>
+			<label for="gridType">
+				<select class="toolBarSubElement" name="gridType" id="gridType" width="6">
+					<option class="toolBarSubElement" value="rect" selected>rect</option>
+					<option class="toolBarSubElement" value="hex">hex</option>
+				</select>
+				<span class=toolBarSubElement>Type</span>
+			</label>
+		</fieldset>
+
+
 
 		<a class="toolBarElement" id="FAQLink" href="#">FAQ</a>
 

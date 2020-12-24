@@ -63,6 +63,7 @@ fieldset.toolBarElement {
 input[type=number].toolBarSubElement,
 input[type=text].toolBarSubElement {
   height: 20px;
+  width: 5em;
   padding: 2px 6px; /* The 6px vertically centers text on FF, ignored by Webkit */
 }
 
