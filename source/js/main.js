@@ -405,10 +405,15 @@ class symmetry {
 				if (this.point2 != null && this.point1 != null) {
 					let dx = this.point2[0] - this.point1[0];
 					let dy = this.point2[1] - this.point1[1];
-					for (let t = 0; t < this.order; t++) {
-						[newX, newY] = [x+dx*(t+1), y+dy*(t+1)];
-						newXs[t] = newX;
-						newYs[t] = newY;
+					let k = 0;
+					let start = balancedTranslation ? Math.ceil(-this.order/2) : 0;
+					for (let t = start; t < start+this.order; t++) {
+			 			if (t != 0) {
+							[newX, newY] = [x+dx*t, y+dy*t];
+							newXs[k] = newX;
+							newYs[k] = newY;
+							k += 1;
+						}
 					}
 				}
 				break;
@@ -417,16 +422,21 @@ class symmetry {
 					let [xr, yr] = reflect(x, y, this.point1[0], this.point1[1], this.point2[0], this.point2[1]);
 					let dx = this.point2[0] - this.point1[0];
 					let dy = this.point2[1] - this.point1[1];
-					for (let g = 0; g < this.order; g++) {
-						if ((g % 2) == 0) {
-							// Use reflected point
-							[newX, newY] = [xr+dx*(g+1), yr+dy*(g+1)];
-						} else {
-							// Use original point
-							[newX, newY] = [x+dx*(g+1), y+dy*(g+1)];
+					let k = 0;
+					let start = balancedTranslation ? Math.ceil(-this.order/2) : 0;
+					for (let g = start; g < start+this.order; g++) {
+						if (g != 0) {
+							if ((g % 2) == 0) {
+								// Use original point
+								[newX, newY] = [x+dx*g, y+dy*g];
+							} else {
+								// Use reflected point
+								[newX, newY] = [xr+dx*g, yr+dy*g];
+							}
+							newXs[k] = newX;
+							newYs[k] = newY;
+							k += 1;
 						}
-						newXs[g] = newX;
-						newYs[g] = newY;
 					}
 				}
 				break;
@@ -519,6 +529,7 @@ var symmetries = initializeSymmetryList();
 sortSymmetries(symmetries);
 var scaleBaseRadius = 40;
 var maxColorHistorySize = 5;
+var balancedTranslation = true;   // Should translation/glid symmetries be two-sided? Or just one-sided?
 
 var undoStack = [];
 var redoStack = [];
