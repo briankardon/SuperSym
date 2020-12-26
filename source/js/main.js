@@ -10,7 +10,7 @@ $(document).keydown(function(e) {
 			gridSnap = true;
 			break;
 		case 'z':
-			if (e.metaKey || e.ctrlKey) {
+			if (e.metaKey || e.ctrlKey || e.shiftKey) {
 				e.preventDefault()
 			}
 			break;
@@ -76,6 +76,12 @@ $(document).keyup(function(e) {
 		case 'z':
 			if (e.metaKey || e.ctrlKey) {
 				undo();
+				e.preventDefault()
+			}
+			break;
+		case 'Z':
+			if (e.metaKey || e.ctrlKey) {
+				redo();
 				e.preventDefault()
 			}
 			break;
@@ -291,7 +297,12 @@ function importSymmetries(serializedSymmetries) {
 	if (serializedSymmetries == undefined) {
 		serializedSymmetries = $("#savedSymmetries option:selected").val();
 	}
-	var symmetryList = JSON.parse(decodeURI(serializedSymmetries));
+	var symmetryList;
+	if (typeof(serializedSymmetries) == "string") {
+		symmetryList = JSON.parse(decodeURI(serializedSymmetries));
+	} else {
+		symmetryList = serializedSymmetries;
+	}
 	symmetryList = symmetryList.map(obj => symmetry.fromObject(obj));
 	return symmetryList;
 }
@@ -509,6 +520,11 @@ sortSymmetries(symmetries);
 var scaleBaseRadius = 40;
 var maxColorHistorySize = 5;
 
+var undoStack = [];
+var redoStack = [];
+var undoStackLength = 10;  // maximum number of undo's
+var currentState = packState();
+
 var gridSnap;  // Running record of latest user entered grid snap state
 var gridSizeX;  // Running record of latest user entered grid size.
 var gridSizeY;
@@ -583,6 +599,13 @@ function sortSymmetries(symmetryList) {
 	symmetryList.sort(compareSymmetryLevel);
 }
 
+function removeSymmetry(symmetryIndex) {
+	let removedSymmetry = symmetries.splice(symmetryIndex, 1)[0];
+	saveState();
+	return removedSymmetry;
+}
+
+
 function addSymmetry(symmetry) {
 	symmetries.push(symmetry);
 	sortSymmetries(symmetries);
@@ -592,6 +615,7 @@ function addSymmetry(symmetry) {
 		var currentSymmetryLevel = getSelectedSymmetryLevel();
 		setSelectedSymmetryLevel(parseInt(currentSymmetryLevel)+1);
 	}
+	saveState();
 }
 
 function applySymmetries(xs, ys, remainingSymmetries) {
@@ -663,21 +687,85 @@ function restartFromLast() {
 }
 
 function undo() {
-	let lastStrokeStartIndex = 0;
-	let pointCount = 0;
-	for (var k = traceX[0].length-1; k >= 0; k--) {
-		if (isNaN(traceX[0][k])) {
-			if (pointCount > 0) {
-				lastStrokeStartIndex = k+1;
-				break;
-			}
-		} else {
-			pointCount++;
-		}
+	// Make sure there's at least one state to undo
+	if (undoStack.length == 0) {
+		return;
 	}
-	traceX = [traceX[0].slice(0, lastStrokeStartIndex)]
-	traceY = [traceY[0].slice(0, lastStrokeStartIndex)]
-	traceC = [traceC[0].slice(0, lastStrokeStartIndex)]
+
+	// Add current state to redo stack
+	redoStack.unshift(currentState);
+
+	// Ensure redo stack does not exceed maximum length
+	if (redoStack.length > undoStackLength) {
+		redoStack.pop();
+	}
+
+	// Set previous state to current state
+	currentState = undoStack.shift();
+
+	// Reload new current state
+	recallState(currentState);
+}
+
+function redo() {
+	// Make sure there's at least one state to redo
+	if (redoStack.length == 0) {
+		return;
+	}
+
+	// Save current state to undo stack
+	undoStack.unshift(currentState);
+
+	// Ensure undo stack does not exceed maximum length
+	if (undoStack.length > undoStackLength) {
+		undoStack.pop();
+	}
+
+	// Set previous state to current state
+	currentState = redoStack.shift();
+
+	// Reload redone state
+	recallState(currentState);
+}
+
+function saveState() {
+	// Ensure symmetries are sorted
+	sortSymmetries(symmetries);
+
+	// Add current saved state to undo stack
+	undoStack.unshift(currentState);
+
+	// Ensure undo stack does not exceed maximum length
+	if (undoStack.length > undoStackLength) {
+		undoStack.pop();
+	}
+
+	// Record new current state.
+	currentState = packState();
+
+	// Clear redo state
+	clearRedoStack()
+}
+
+function clearRedoStack() {
+	redoStack = [];
+}
+
+function packState() {
+	return JSON.stringify({
+		symmetries:symmetries,
+		traceX:traceX[0],
+		traceY:traceY[0],
+		traceC:traceC[0]
+	});
+}
+
+function recallState(stateString) {
+	let state = JSON.parse(stateString);
+	traceX = [state.traceX];
+	traceY = [state.traceY];
+	traceC = [state.traceC];
+	symmetries = importSymmetries(state.symmetries);
 	recalculateSymmetries();
 }
 
@@ -691,7 +779,6 @@ function recalculateSymmetries(includeTemporarySymmetry) {
 	for (var k = 0; k < baseTraceX.length; k++) {
 		addPoint(baseTraceX[k], baseTraceY[k], baseTraceC[k], includeTemporarySymmetry);
 	}
-
 	updateCanvas();
 }
 
@@ -718,6 +805,7 @@ function endSegment(evt) {
 		traceY[k].push(NaN);
 		traceC[k].push(NaN);
 	}
+	saveState();
 	return false;
 }
 
@@ -942,7 +1030,7 @@ function clickHandler(evt, touchType) {
 			}
 		} else if (evt.ctrlKey | evt.altKey) {    // Clicking on an existing symmetry with control key down
 			// Control button was pressed
-			temporarySymmetry = symmetries.splice(hoverSymmetryIndex, 1)[0];
+			temporarySymmetry = removeSymmetry(hoverSymmetryIndex);
 			// Make sure we're starting by editing the correct point
 			if (temporarySymmetry.type == "scale") {
 				// For scale symmetries, it makes more sense to pick up the primary point and leave the secondary point undefined.
@@ -995,7 +1083,6 @@ function mousemoveHandler(evt, isTouch) {
 			updateCanvas();
 		}
 	} else if (mode == "editSymmetries") {
-		//		console.log(hoverSymmetryIndex, temporarySymmetry == null ? null : temporarySymmetry.type);
 		var canvasUpdateNeeded = false;
 		if (!isTouch) {
 			// hovering to edit not yet supported for touch devices
@@ -1365,12 +1452,14 @@ function clearDrawing() {
 	traceX = [[]];
 	traceY = [[]];
 	traceC = [[]];
+	saveState();
 	updateCanvas();
 }
 
 function clearSymmetries() {
 	symmetries = [new symmetry("identity", Number.NEGATIVE_INFINITY, null, null, 0)];
 	$("#symmetryLevel").val(1);
+	saveState();
 	updateCanvas();
 }
 
