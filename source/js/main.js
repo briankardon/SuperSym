@@ -6,6 +6,7 @@
 $(document).keydown(function(e) {
 	switch(e.key) {
 		case 'x':
+		case 'X':
 			$("#gridSnap").prop('checked', true);
 			gridSnap = true;
 			break;
@@ -19,6 +20,7 @@ $(document).keydown(function(e) {
 $(document).keyup(function(e) {
 	switch(e.key) {
 		case 'x':
+		case 'X':
 			$("#gridSnap").prop('checked', false);
 			gridSnap = false;
 			break;
