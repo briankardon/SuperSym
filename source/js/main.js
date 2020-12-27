@@ -300,6 +300,12 @@ function importSymmetries(serializedSymmetries) {
 	var symmetryList;
 	if (typeof(serializedSymmetries) == "string") {
 		symmetryList = JSON.parse(decodeURI(serializedSymmetries));
+		for (let k = 0; k < symmetryList.length; k++) {
+			if (symmetryList[k].level == null) {
+				// JSON encodes negative infinity as "null". This restores the correct value.
+				symmetryList[k].level = Number.NEGATIVE_INFINITY;
+			}
+		}
 	} else {
 		symmetryList = serializedSymmetries;
 	}
@@ -314,6 +320,7 @@ function exportCurrentSymmetriesToUser() {
 function importSymmetriesFromUser() {
 	serializedSymmetries = prompt("Paste encoded symmetry text here:");
 	symmetries = importSymmetries(serializedSymmetries);
+	recalculateSymmetries();
 	updateCanvas();
 }
 
@@ -1043,7 +1050,7 @@ function clickHandler(evt, touchType) {
 			// Control button was pressed
 			temporarySymmetry = removeSymmetry(hoverSymmetryIndex);
 			// Make sure we're starting by editing the correct point
-			if (temporarySymmetry.type == "scale") {
+			if (temporarySymmetry.type == "scale" || temporarySymmetry.type == "spiral") {
 				// For scale symmetries, it makes more sense to pick up the primary point and leave the secondary point undefined.
 				temporarySymmetry.point2 = undefined;
 			} else {
@@ -1180,23 +1187,20 @@ function addPredefinedSymmetryConfigurations() {
 	let configs = {
 		"1trans4_2rot7":"%5B%7B%22type%22:%22identity%22,%22level%22:0,%22point1%22:null,%22point2%22:null,%22order%22:0,%22tracesX%22:%5B%5D,%22tracesY%22:%5B%5D%7D,%7B%22type%22:%22rotation%22,%22level%22:2,%22point1%22:%5B696,234.59999084472656%5D,%22order%22:7,%22tracesX%22:%5B%5D,%22tracesY%22:%5B%5D%7D,%7B%22type%22:%22translation%22,%22level%22:1,%22point1%22:%5B716,180.59999084472656%5D,%22point2%22:%5B724,167.59999084472656%5D,%22order%22:4,%22tracesX%22:%5B%5D,%22tracesY%22:%5B%5D%7D%5D",
 		"1rot7_2rot3":"%5B%7B%22type%22:%22identity%22,%22level%22:0,%22point1%22:null,%22point2%22:null,%22order%22:0,%22tracesX%22:%5B%5D,%22tracesY%22:%5B%5D%7D,%7B%22type%22:%22rotation%22,%22level%22:1,%22point1%22:%5B717,273.59999084472656%5D,%22order%22:7,%22tracesX%22:%5B%5D,%22tracesY%22:%5B%5D%7D,%7B%22type%22:%22rotation%22,%22level%22:2,%22point1%22:%5B823,268.59999084472656%5D,%22order%22:3,%22tracesX%22:%5B%5D,%22tracesY%22:%5B%5D%7D%5D",
-		"1rot3_2rot12":"%5B%7B%22type%22:%22identity%22,%22level%22:0,%22point1%22:null,%22point2%22:null,%22order%22:0,%22tracesX%22:%5B%5D,%22tracesY%22:%5B%5D%7D,%7B%22type%22:%22rotation%22,%22level%22:1,%22point1%22:%5B648,231.59999084472656%5D,%22order%22:3,%22tracesX%22:%5B%5D,%22tracesY%22:%5B%5D%7D,%7B%22type%22:%22rotation%22,%22level%22:2,%22point1%22:%5B797,231.59999084472656%5D,%22order%22:12,%22tracesX%22:%5B%5D,%22tracesY%22:%5B%5D%7D%5D",
-		"1line_2line_3line":"%5B%7B%22type%22:%22identity%22,%22level%22:0,%22point1%22:null,%22point2%22:null,%22order%22:0,%22tracesX%22:%5B%5D,%22tracesY%22:%5B%5D%7D,%7B%22type%22:%22line%22,%22level%22:1,%22point1%22:%5B596,224.59999084472656%5D,%22point2%22:%5B645,173.59999084472656%5D,%22tracesX%22:%5B%5D,%22tracesY%22:%5B%5D%7D,%7B%22type%22:%22line%22,%22level%22:2,%22point1%22:%5B624,227.59999084472656%5D,%22point2%22:%5B640,241.59999084472656%5D,%22tracesX%22:%5B%5D,%22tracesY%22:%5B%5D%7D,%7B%22type%22:%22line%22,%22level%22:4,%22point1%22:%5B660,243.59999084472656%5D,%22point2%22:%5B659,199.59999084472656%5D,%22tracesX%22:%5B%5D,%22tracesY%22:%5B%5D%7D%5D",
-		"1rot29":"%5B%7B%22type%22:%22identity%22,%22level%22:0,%22point1%22:null,%22point2%22:null,%22order%22:0,%22tracesX%22:%5B%5D,%22tracesY%22:%5B%5D%7D,%7B%22type%22:%22rotation%22,%22level%22:1,%22point1%22:%5B681,220.59999084472656%5D,%22order%22:29,%22tracesX%22:%5B%5D,%22tracesY%22:%5B%5D%7D%5D",
-		"1rot7_2line":"%5B%7B%22type%22:%22identity%22,%22level%22:0,%22point1%22:null,%22point2%22:null,%22order%22:0,%22tracesX%22:%5B%5D,%22tracesY%22:%5B%5D%7D,%7B%22type%22:%22rotation%22,%22level%22:1,%22point1%22:%5B663,208.59999084472656%5D,%22order%22:7,%22tracesX%22:%5B%5D,%22tracesY%22:%5B%5D%7D,%7B%22type%22:%22line%22,%22level%22:2,%22point1%22:%5B738,162.59999084472656%5D,%22point2%22:%5B736,240.59999084472656%5D,%22tracesX%22:%5B%5D,%22tracesY%22:%5B%5D%7D%5D",
-		"1rot7_2trans7_3trans4":"%5B%7B%22type%22:%22identity%22,%22level%22:0,%22point1%22:null,%22point2%22:null,%22order%22:0,%22tracesX%22:%5B%5D,%22tracesY%22:%5B%5D%7D,%7B%22type%22:%22rotation%22,%22level%22:1,%22point1%22:%5B416,392.59999084472656%5D,%22order%22:7,%22tracesX%22:%5B%5D,%22tracesY%22:%5B%5D%7D,%7B%22type%22:%22translation%22,%22level%22:2,%22point1%22:%5B462,388.59999084472656%5D,%22point2%22:%5B575,384.59999084472656%5D,%22order%22:7,%22tracesX%22:%5B%5D,%22tracesY%22:%5B%5D%7D,%7B%22type%22:%22translation%22,%22level%22:3,%22point1%22:%5B464,372.59999084472656%5D,%22point2%22:%5B464,268.59999084472656%5D,%22order%22:4,%22tracesX%22:%5B%5D,%22tracesY%22:%5B%5D%7D%5D",
-		"1rot4_2line":"%5B%7B%22type%22:%22identity%22,%22level%22:0,%22point1%22:null,%22point2%22:null,%22order%22:0,%22tracesX%22:%5B%5D,%22tracesY%22:%5B%5D%7D,%7B%22type%22:%22rotation%22,%22level%22:1,%22point1%22:%5B696,235.59999084472656%5D,%22order%22:4,%22tracesX%22:%5B%5D,%22tracesY%22:%5B%5D%7D,%7B%22type%22:%22line%22,%22level%22:2,%22point1%22:%5B560,105.59999084472656%5D,%22point2%22:%5B662,202.59999084472656%5D,%22tracesX%22:%5B%5D,%22tracesY%22:%5B%5D%7D%5D",
-		"1line_2line_3rot7":"%5B%7B%22type%22:%22identity%22,%22level%22:0,%22point1%22:null,%22point2%22:null,%22order%22:0,%22tracesX%22:%5B%5D,%22tracesY%22:%5B%5D%7D,%7B%22type%22:%22line%22,%22level%22:1,%22point1%22:%5B578,261.59999084472656%5D,%22point2%22:%5B720,196.59999084472656%5D,%22tracesX%22:%5B%5D,%22tracesY%22:%5B%5D%7D,%7B%22type%22:%22line%22,%22level%22:2,%22point1%22:%5B544,166.59999084472656%5D,%22point2%22:%5B823,300.59999084472656%5D,%22tracesX%22:%5B%5D,%22tracesY%22:%5B%5D%7D,%7B%22type%22:%22rotation%22,%22level%22:3,%22point1%22:%5B664,223.59999084472656%5D,%22order%22:7,%22tracesX%22:%5B%5D,%22tracesY%22:%5B%5D%7D%5D",
-		"1scale5_2rot6":"%5B%7B%22type%22:%22identity%22,%22level%22:0,%22point1%22:null,%22point2%22:null,%22order%22:0,%22tracesX%22:%5B%5D,%22tracesY%22:%5B%5D%7D,%7B%22type%22:%22scale%22,%22level%22:1,%22point1%22:%5B640,188.6363525390625%5D,%22point2%22:%5B658,176.6363525390625%5D,%22order%22:5,%22tracesX%22:%5B%5D,%22tracesY%22:%5B%5D%7D,%7B%22type%22:%22rotation%22,%22level%22:2,%22point1%22:%5B640,187.6363525390625%5D,%22order%22:6,%22tracesX%22:%5B%5D,%22tracesY%22:%5B%5D%7D%5D",
-		"1rot7_2line_v2":"%5B%7B%22type%22:%22identity%22,%22level%22:0,%22point1%22:null,%22point2%22:null,%22order%22:0,%22tracesX%22:%5B%5D,%22tracesY%22:%5B%5D%7D,%7B%22type%22:%22rotation%22,%22level%22:1,%22point1%22:%5B538,223.4545440673828%5D,%22order%22:7,%22tracesX%22:%5B%5D,%22tracesY%22:%5B%5D%7D,%7B%22type%22:%22line%22,%22level%22:2,%22point1%22:%5B259,223.4545440673828%5D,%22point2%22:%5B768,223.4545440673828%5D,%22tracesX%22:%5B%5D,%22tracesY%22:%5B%5D%7D%5D",
+		"1rot3_2rot12":"%5B%7B%22type%22:%22identity%22,%22level%22:0,%22point1%22:null,%22point2%22:null,%22order%22:0%7D,%7B%22type%22:%22rotation%22,%22level%22:1,%22point1%22:%5B630,259.80762113533154%5D,%22order%22:3%7D,%7B%22type%22:%22rotation%22,%22level%22:2,%22point1%22:%5B810,259.80762113533154%5D,%22order%22:12%7D%5D",
+		"1line_2line_3line":"%5B%7B%22type%22:%22identity%22,%22level%22:0,%22point1%22:null,%22point2%22:null,%22order%22:0%7D,%7B%22type%22:%22line%22,%22level%22:1,%22point1%22:%5B700,120%5D,%22point2%22:%5B560,260%5D%7D,%7B%22type%22:%22line%22,%22level%22:2,%22point1%22:%5B560,160%5D,%22point2%22:%5B700,320%5D%7D,%7B%22type%22:%22line%22,%22level%22:4,%22point1%22:%5B660,120%5D,%22point2%22:%5B660,320%5D%7D%5D",
+		"1rot29":"%5B%7B%22type%22:%22identity%22,%22level%22:0,%22point1%22:null,%22point2%22:null,%22order%22:0%7D,%7B%22type%22:%22rotation%22,%22level%22:1,%22point1%22:%5B700,311.76914536239786%5D,%22order%22:29%7D%5D",
+		"1rot7_2line":"%5B%7B%22type%22:%22identity%22,%22level%22:0,%22point1%22:null,%22point2%22:null,%22order%22:0%7D,%7B%22type%22:%22rotation%22,%22level%22:1,%22point1%22:%5B540,242.4871130596428%5D,%22order%22:7%7D,%7B%22type%22:%22line%22,%22level%22:2,%22point1%22:%5B650,121.2435565298214%5D,%22point2%22:%5B650,363.7306695894642%5D%7D%5D",
+		"1rot4_2line":"%5B%7B%22type%22:%22identity%22,%22level%22:0,%22point1%22:null,%22point2%22:null,%22order%22:0%7D,%7B%22type%22:%22rotation%22,%22level%22:1,%22point1%22:%5B660,300%5D,%22order%22:4%7D,%7B%22type%22:%22line%22,%22level%22:2,%22point1%22:%5B660,300%5D,%22point2%22:%5B560,200%5D%7D%5D",
+		"1line_2line_3rot7":"%5B%7B%22type%22:%22identity%22,%22level%22:0,%22point1%22:null,%22point2%22:null,%22order%22:0%7D,%7B%22type%22:%22line%22,%22level%22:1,%22point1%22:%5B680,280%5D,%22point2%22:%5B800,200%5D%7D,%7B%22type%22:%22line%22,%22level%22:2,%22point1%22:%5B680,280%5D,%22point2%22:%5B540,200%5D%7D,%7B%22type%22:%22rotation%22,%22level%22:3,%22point1%22:%5B680,280%5D,%22order%22:7%7D%5D",
+		"1scale5_2rot6":"%5B%7B%22type%22:%22identity%22,%22level%22:0,%22point1%22:null,%22point2%22:null,%22order%22:0%7D,%7B%22type%22:%22scale%22,%22level%22:1,%22point1%22:%5B680,280%5D,%22point2%22:%5B687,254%5D,%22order%22:5%7D,%7B%22type%22:%22rotation%22,%22level%22:2,%22point1%22:%5B680,280%5D,%22order%22:6%7D%5D",
 		"1rot3_2scl_2scl_2scl":"%5B%7B%22type%22:%22identity%22,%22level%22:null,%22point1%22:null,%22point2%22:null,%22order%22:0%7D,%7B%22type%22:%22rotation%22,%22level%22:1,%22point1%22:%5B703,246%5D,%22order%22:3%7D,%7B%22type%22:%22scale%22,%22level%22:2,%22point1%22:%5B628,117%5D,%22point2%22:%5B618,97%5D,%22order%22:6%7D,%7B%22type%22:%22scale%22,%22level%22:2,%22point1%22:%5B852,247%5D,%22point2%22:%5B872,246%5D,%22order%22:6%7D,%7B%22type%22:%22scale%22,%22level%22:2,%22point1%22:%5B632,369%5D,%22point2%22:%5B622,386%5D,%22order%22:6%7D%5D",
-		"1scl6_2scl6_3scl6_4rot3":"%5B%7B%22type%22:%22identity%22,%22level%22:null,%22point1%22:null,%22point2%22:null,%22order%22:0%7D,%7B%22type%22:%22scale%22,%22level%22:1,%22point1%22:%5B510,287%5D,%22point2%22:%5B521,269%5D,%22order%22:6%7D,%7B%22type%22:%22scale%22,%22level%22:2,%22point1%22:%5B604,114%5D,%22point2%22:%5B607,134%5D,%22order%22:6%7D,%7B%22type%22:%22scale%22,%22level%22:3,%22point1%22:%5B708,280%5D,%22point2%22:%5B696,264%5D,%22order%22:6%7D,%7B%22type%22:%22rotation%22,%22level%22:4,%22point1%22:%5B608,227%5D,%22order%22:3%7D%5D",
-		"1rot6_2rot17_3scl7":"%5B%7B%22type%22:%22identity%22,%22level%22:null,%22point1%22:null,%22point2%22:null,%22order%22:0%7D,%7B%22type%22:%22rotation%22,%22level%22:1,%22point1%22:%5B694,268%5D,%22order%22:6%7D,%7B%22type%22:%22rotation%22,%22level%22:3,%22point1%22:%5B885,268%5D,%22order%22:17%7D,%7B%22type%22:%22scale%22,%22level%22:4,%22point1%22:%5B885,269%5D,%22point2%22:%5B905,253%5D,%22order%22:7%7D%5D",
-		"1spi18_2rot6":"%5B%7B%22type%22:%22identity%22,%22level%22:null,%22point1%22:null,%22point2%22:null,%22order%22:0%7D,%7B%22type%22:%22spiral%22,%22level%22:1,%22point1%22:%5B448,274%5D,%22point2%22:%5B458,242%5D,%22order%22:18%7D,%7B%22type%22:%22rotation%22,%22level%22:2,%22point1%22:%5B547,273%5D,%22order%22:6%7D%5D",
-		"1spi18_2rot6_3spi18_4rot6":"%5B%7B%22type%22:%22identity%22,%22level%22:null,%22point1%22:null,%22point2%22:null,%22order%22:0%7D,%7B%22type%22:%22spiral%22,%22level%22:1,%22point1%22:%5B531,272%5D,%22point2%22:%5B543,240%5D,%22order%22:18%7D,%7B%22type%22:%22rotation%22,%22level%22:2,%22point1%22:%5B530,272%5D,%22order%22:6%7D,%7B%22type%22:%22spiral%22,%22level%22:3,%22point1%22:%5B734,271%5D,%22point2%22:%5B745,239%5D,%22order%22:18%7D,%7B%22type%22:%22rotation%22,%22level%22:4,%22point1%22:%5B733,270%5D,%22order%22:5%7D%5D",
-		"1rot3_2trans7x2_3trans7x2":"%5B%7B%22type%22:%22identity%22,%22level%22:null,%22point1%22:null,%22point2%22:null,%22order%22:0%7D,%7B%22type%22:%22rotation%22,%22level%22:1,%22point1%22:%5B580,291%5D,%22order%22:3%7D,%7B%22type%22:%22translation%22,%22level%22:2,%22point1%22:%5B579,290%5D,%22point2%22:%5B681,290%5D,%22order%22:7%7D,%7B%22type%22:%22translation%22,%22level%22:2,%22point1%22:%5B681,290%5D,%22point2%22:%5B580,290%5D,%22order%22:7%7D,%7B%22type%22:%22translation%22,%22level%22:3,%22point1%22:%5B579,290%5D,%22point2%22:%5B529,201%5D,%22order%22:7%7D,%7B%22type%22:%22translation%22,%22level%22:3,%22point1%22:%5B528,201%5D,%22point2%22:%5B579,290%5D,%22order%22:7%7D%5D",
-		"1rot3_2trans7x2_3trans7x2":"%5B%7B%22type%22:%22identity%22,%22level%22:null,%22point1%22:null,%22point2%22:null,%22order%22:0%7D,%7B%22type%22:%22rotation%22,%22level%22:2,%22point1%22:%5B580,291%5D,%22order%22:3%7D,%7B%22type%22:%22translation%22,%22level%22:3,%22point1%22:%5B579,290%5D,%22point2%22:%5B681,290%5D,%22order%22:7%7D,%7B%22type%22:%22translation%22,%22level%22:3,%22point1%22:%5B681,290%5D,%22point2%22:%5B580,290%5D,%22order%22:7%7D,%7B%22type%22:%22translation%22,%22level%22:4,%22point1%22:%5B579,290%5D,%22point2%22:%5B529,201%5D,%22order%22:7%7D,%7B%22type%22:%22translation%22,%22level%22:4,%22point1%22:%5B528,201%5D,%22point2%22:%5B579,290%5D,%22order%22:7%7D%5D",
-		"1line_2rot3_3trans7x2_4trans7x2":"%5B%7B%22type%22:%22identity%22,%22level%22:null,%22point1%22:null,%22point2%22:null,%22order%22:0%7D,%7B%22type%22:%22line%22,%22level%22:1,%22point1%22:%5B579,291%5D,%22point2%22:%5B684,290%5D,%22order%22:2%7D,%7B%22type%22:%22rotation%22,%22level%22:2,%22point1%22:%5B580,291%5D,%22order%22:3%7D,%7B%22type%22:%22translation%22,%22level%22:3,%22point1%22:%5B579,290%5D,%22point2%22:%5B681,290%5D,%22order%22:7%7D,%7B%22type%22:%22translation%22,%22level%22:3,%22point1%22:%5B681,290%5D,%22point2%22:%5B580,290%5D,%22order%22:7%7D,%7B%22type%22:%22translation%22,%22level%22:4,%22point1%22:%5B579,290%5D,%22point2%22:%5B529,201%5D,%22order%22:7%7D,%7B%22type%22:%22translation%22,%22level%22:4,%22point1%22:%5B528,201%5D,%22point2%22:%5B579,290%5D,%22order%22:7%7D%5D"
+		"1scl6_2scl6_3scl6_4rot3":"%5B%7B%22type%22:%22identity%22,%22level%22:null,%22point1%22:null,%22point2%22:null,%22order%22:0%7D,%7B%22type%22:%22scale%22,%22level%22:1,%22point1%22:%5B630,363.7306695894642%5D,%22point2%22:%5B647.5,350.7402885326976%5D,%22order%22:6%7D,%7B%22type%22:%22scale%22,%22level%22:2,%22point1%22:%5B630,103.92304845413263%5D,%22point2%22:%5B642.5,125.57368354874359%5D,%22order%22:6%7D,%7B%22type%22:%22scale%22,%22level%22:3,%22point1%22:%5B855,233.8268590217984%5D,%22point2%22:%5B830,233.8268590217984%5D,%22order%22:6%7D,%7B%22type%22:%22rotation%22,%22level%22:4,%22point1%22:%5B705,233.8268590217984%5D,%22order%22:3%7D%5D",
+		"1rot6_2rot17_3scl7":"%5B%7B%22type%22:%22identity%22,%22level%22:null,%22point1%22:null,%22point2%22:null,%22order%22:0%7D,%7B%22type%22:%22rotation%22,%22level%22:1,%22point1%22:%5B570,311.76914536239786%5D,%22order%22:6%7D,%7B%22type%22:%22rotation%22,%22level%22:3,%22point1%22:%5B750,311.76914536239786%5D,%22order%22:17%7D,%7B%22type%22:%22scale%22,%22level%22:4,%22point1%22:%5B750,311.76914536239786%5D,%22point2%22:%5B762,290%5D,%22order%22:7%7D%5D",
+		"1spi18_2rot6":"%5B%7B%22type%22:%22identity%22,%22level%22:null,%22point1%22:null,%22point2%22:null,%22order%22:0%7D,%7B%22type%22:%22spiral%22,%22level%22:1,%22point1%22:%5B630,311.76914536239786%5D,%22point2%22:%5B651,287%5D,%22order%22:18%7D,%7B%22type%22:%22rotation%22,%22level%22:2,%22point1%22:%5B750,311.76914536239786%5D,%22order%22:6%7D%5D",
+		"1spi18_2rot6_3spi18_4rot6":"%5B%7B%22type%22:%22identity%22,%22level%22:null,%22point1%22:null,%22point2%22:null,%22order%22:0%7D,%7B%22type%22:%22spiral%22,%22level%22:1,%22point1%22:%5B537.5,272.7980021920981%5D,%22point2%22:%5B570,277.12812921102034%5D,%22order%22:18%7D,%7B%22type%22:%22rotation%22,%22level%22:2,%22point1%22:%5B537.5,272.7980021920981%5D,%22order%22:6%7D,%7B%22type%22:%22spiral%22,%22level%22:3,%22point1%22:%5B742.5,272.7980021920981%5D,%22point2%22:%5B712.5,272.7980021920981%5D,%22order%22:18%7D,%7B%22type%22:%22rotation%22,%22level%22:4,%22point1%22:%5B742.5,272.7980021920981%5D,%22order%22:5%7D%5D",
+		"1rot3_2trans7_3trans7":"%5B%7B%22type%22:%22identity%22,%22level%22:null,%22point1%22:null,%22point2%22:null,%22order%22:0%7D,%7B%22type%22:%22rotation%22,%22level%22:1,%22point1%22:%5B660,311.76914536239786%5D,%22order%22:3%7D,%7B%22type%22:%22translation%22,%22level%22:2,%22point1%22:%5B660,311.76914536239786%5D,%22point2%22:%5B780,311.76914536239786%5D,%22order%22:20%7D,%7B%22type%22:%22translation%22,%22level%22:3,%22point1%22:%5B660,311.76914536239786%5D,%22point2%22:%5B600,207.84609690826525%5D,%22order%22:10%7D%5D",
+		"0line_1rot3_2trans7_3trans7":"%5B%7B%22type%22:%22identity%22,%22level%22:null,%22point1%22:null,%22point2%22:null,%22order%22:0%7D,%7B%22type%22:%22line%22,%22level%22:0,%22point1%22:%5B660,311.76914536239786%5D,%22point2%22:%5B600,311.76914536239786%5D%7D,%7B%22type%22:%22rotation%22,%22level%22:1,%22point1%22:%5B660,311.76914536239786%5D,%22order%22:3%7D,%7B%22type%22:%22translation%22,%22level%22:2,%22point1%22:%5B660,311.76914536239786%5D,%22point2%22:%5B780,311.76914536239786%5D,%22order%22:20%7D,%7B%22type%22:%22translation%22,%22level%22:3,%22point1%22:%5B660,311.76914536239786%5D,%22point2%22:%5B600,207.84609690826525%5D,%22order%22:10%7D%5D"
 	};
 	for (const [name, value] of Object.entries(configs)) {
 		let newOption = `<option class="toolBarSubElement" value=${value}>${name}</option>`;
@@ -1612,16 +1616,26 @@ function drawLineSymmetry(sym, color, alpha, verbose) {
 }
 
 function drawFullLine(x1, y1, x2, y2, color, dash, lineWidth) {
+	// Get length guaranteed to be longer than canvas diagonal
+	let L = drawCanvas.width + drawCanvas.height;
 	let dx = x2 - x1;
 	let dy = y2 - y1;
-	let yIntercept0 = y1 - x1 * dy / dx;
-	let yIntercept1 = y1 - (x1 - drawCanvas.width) * dy / dx;
+	// Pick the largest delta to generate scaling factor
+	let maxDelta = Math.max(Math.abs(dx), Math.abs(dy));
+	if (maxDelta == 0) {
+		return;
+	}
+	let scale = L / maxDelta;
+	// Increase dx and dy so x +/- dx and y +/- dy are all guaranteed to be off of canvas,
+	// 	ensuring line will go all the way across the canvas.
+	dx = scale * dx;
+	dy = scale * dy;
 	drawCtx.linewidth = lineWidth;
 	drawCtx.strokeStyle = color;
 	drawCtx.setLineDash(dash)
 	drawCtx.beginPath();
-	drawCtx.moveTo(0, yIntercept0);
-	drawCtx.lineTo(drawCanvas.width, yIntercept1);
+	drawCtx.moveTo(x1-dx, y1-dy);
+	drawCtx.lineTo(x1+dx, y1+dy);
 	drawCtx.stroke();
 }
 
