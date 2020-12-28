@@ -301,21 +301,24 @@ function getSymmetryConfigurationName(symmetryList) {
 		}
 	}
 }
-function importSymmetries(serializedSymmetries) {
+function importSymmetries(serializedSymmetries, uriEncoded) {
 	if (serializedSymmetries == undefined) {
 		serializedSymmetries = $("#savedSymmetries option:selected").val();
 	}
+	if (uriEncoded == undefined) {
+		uriEncoded = true;
+	}
 	var symmetryList;
 	if (typeof(serializedSymmetries) == "string") {
-		symmetryList = JSON.parse(decodeURI(serializedSymmetries));
-		for (let k = 0; k < symmetryList.length; k++) {
-			if (symmetryList[k].level == null) {
-				// JSON encodes negative infinity as "null". This restores the correct value.
-				symmetryList[k].level = Number.NEGATIVE_INFINITY;
-			}
-		}
+		symmetryList = JSON.parse(uriEncoded ? decodeURI(serializedSymmetries) : serializedSymetries);
 	} else {
 		symmetryList = serializedSymmetries;
+	}
+	for (let k = 0; k < symmetryList.length; k++) {
+		if (symmetryList[k].level == null) {
+			// JSON encodes negative infinity as "null". This restores the correct value.
+			symmetryList[k].level = Number.NEGATIVE_INFINITY;
+		}
 	}
 	symmetryList = symmetryList.map(obj => symmetry.fromObject(obj));
 	return symmetryList;
@@ -347,6 +350,9 @@ class symmetry {
 	}
 	static fromJSON(serializedSymmetry) {
 		var obj = JSON.parse(serializedSymmetry);
+		if (obj.level == null) {
+			obj.level = Number.NEGATIVE_INFINITY;
+		}
 		return new symmetry(obj.type, obj.level, obj.point1, obj.point2, obj.order);
 	}
 	getNumPoints(type) {
@@ -676,7 +682,6 @@ function generateRandomSymmetryList(snapToGrid) {
 			// No identity please
 			type = randchoose(symmetry.types);
 		}
-		console.log('type: ', type);
 		order = randint(...oLim);
 		level = k;
 		x = randints(...xLim, 2);
