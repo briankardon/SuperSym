@@ -130,6 +130,7 @@ function setSymmetryType(type) {
 	mode = 'editSymmetries';
 	$("#editSymmetries").prop("checked", true);
 	$("#symmetryType").val(type);
+	$("#symmetryType").trigger('change');
 	if (lastMouseX != undefined && lastMouseY != undefined) {
 		temporarySymmetry = createSpecifiedSymmetry([lastMouseX, lastMouseY]);
 		updateCanvas();
@@ -355,36 +356,40 @@ class symmetry {
 		}
 		return new symmetry(obj.type, obj.level, obj.point1, obj.point2, obj.order);
 	}
+	getMultiplicity() {
+		switch (this.type) {
+			case "identity":
+				return 1;
+			case "point":
+			case "circle":
+			case "line":
+				return 2;
+			case "rotation":
+			case "translation":
+			case "scale":
+			case "glide":
+			case "spiral":
+				return this.order + 1;
+		}
+	}
 	getNumPoints(type) {
 		// Return the # of points needed to define this symmetry (0, 1, or 2)
 		if (type == undefined) {
 			type = this.type;
 		}
 		switch (type) {
-			case "point":
-				return 1;
-				break;
-			case "line":
-				return 2;
-				break;
-			case "rotation":
-				return 1;
-				break;
-			case "translation":
-				return 2;
-				break;
-			case "scale":
-				return 2;
-				break;
 			case "identity":
 				return 0;
 				break;
+			case "point":
+			case "rotation":
+				return 1;
+				break;
+			case "line":
+			case "translation":
+			case "scale":
 			case "glide":
-				return 2;
-				break;
 			case "spiral":
-				return 2;
-				break;
 			case "circle":
 				return 2;
 				break;
@@ -607,6 +612,9 @@ var gridSnap;  // Running record of latest user entered grid snap state
 var gridSizeX;  // Running record of latest user entered grid size.
 var gridSizeY;
 var gridType;
+
+var progress = 0;
+var progressTimer;
 
 function initializeSymmetryList(otherSymmetries) {
 	// Basically just add an identity symmetry to the beginning.
@@ -929,6 +937,23 @@ function recallState(stateString) {
 	recalculateSymmetries();
 }
 
+function updateProgress() {
+	let visibility;
+	if (progress < 1) {
+		visibility = "visible";
+	} else {
+		visibility = "visible";
+	}
+	let pct = Math.round(100*progress) + "%";
+	console.log("progress=", progress, " pct=", pct, " visbility=", visibility);
+	$("#progressBarBar").css({"width":pct}).html(pct);
+	$("#progressBar").css({"visibility":visibility});
+}
+
+function predictPointCount() {
+	return traceX[0].length * symmetries.map(s => s.getMultiplicity()).reduce((a, b) => a*b);
+}
+
 function recalculateSymmetries(includeTemporarySymmetry) {
 	baseTraceX = traceX[0];
 	baseTraceY = traceY[0];
@@ -936,6 +961,7 @@ function recalculateSymmetries(includeTemporarySymmetry) {
 	traceX = [[]];
 	traceY = [[]];
 	traceC = [[]];
+
 	for (var k = 0; k < baseTraceX.length; k++) {
 		addPoint(baseTraceX[k], baseTraceY[k], baseTraceC[k], includeTemporarySymmetry);
 	}
@@ -1621,6 +1647,7 @@ function clearSymmetries() {
 	symmetries = [new symmetry("identity", Number.NEGATIVE_INFINITY, null, null, 0)];
 	$("#symmetryLevel").val(1);
 	saveState();
+	recalculateSymmetries();
 	updateCanvas();
 }
 

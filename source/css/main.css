@@ -23,6 +23,31 @@
   touch-action:none;
 }
 
+.floater {
+  position: fixed;
+  bottom: 0px;
+  right: 0px;
+  width: 0px;
+  height: 0px;
+}
+
+#progressBar.floater {
+  width: 15em;
+  height: 1.5em;
+  background-color: #0004;
+  visibility: hidden;
+}
+
+#progressBarBar.bar {
+  background: linear-gradient(to right, #00ff, #0f0f 15em);
+  color: #fee;
+  border-radius: 5px;
+  width: 0%;
+  height: 100%;
+  padding: 0px 0px 0px 5px;
+  margin: 0px;
+}
+
 /* Thanks to Gavin Michael for the toolBar: https://codepen.io/GavinMichael/pen/zZejxX */
 .toolBar{
   background-color: #33C3F0;
