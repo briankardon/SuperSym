@@ -1537,7 +1537,7 @@ $(function () {
 	$("#drawTransparency").on('change', updateCanvas)
 
 	// Set version number
-	var version = '1.19';
+	var version = '1.20';
 	$("#footer").html($('#footer').html()+version);
 
 	setModeIndicator("draw");
