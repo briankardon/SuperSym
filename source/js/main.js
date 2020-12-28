@@ -54,6 +54,9 @@ $(document).keyup(function(e) {
 		case 'p':
 			setSymmetryType("point")
 			break;
+		case 'R':
+			generateRandomSymmetryList(gridSnap);
+			break;
 		case 'r':
 			setSymmetryType("rotation")
 			break;
@@ -71,6 +74,9 @@ $(document).keyup(function(e) {
 			break;
 		case 's':
 			setSymmetryType("scale")
+			break;
+		case 'k':
+			setSymmetryType("circle");
 			break;
 		case '?':
 			openShortcutKeyDialog();
@@ -328,13 +334,13 @@ function importSymmetriesFromUser() {
 
 class symmetry {
 	constructor(type, level, point1, point2, order) {
-		// type = "point", "line", "rotation", "translation", "scale", or "identity"
 		this.type = type;
 		this.level = level;
 		this.point1 = point1;
 		this.point2 = point2;
 		this.order = order;
 	}
+	static types = ["point", "line", "rotation", "translation", "scale", "spiral", "glide", "identity", "circle"];
 	static fromObject(obj) {
 		// Convert a generic deserialized symmetry object into a symmetry object
 		return new symmetry(obj.type, obj.level, obj.point1, obj.point2, obj.order);
@@ -342,6 +348,41 @@ class symmetry {
 	static fromJSON(serializedSymmetry) {
 		var obj = JSON.parse(serializedSymmetry);
 		return new symmetry(obj.type, obj.level, obj.point1, obj.point2, obj.order);
+	}
+	getNumPoints(type) {
+		// Return the # of points needed to define this symmetry (0, 1, or 2)
+		if (type == undefined) {
+			type = this.type;
+		}
+		switch (type) {
+			case "point":
+				return 1;
+				break;
+			case "line":
+				return 2;
+				break;
+			case "rotation":
+				return 1;
+				break;
+			case "translation":
+				return 2;
+				break;
+			case "scale":
+				return 2;
+				break;
+			case "identity":
+				return 0;
+				break;
+			case "glide":
+				return 2;
+				break;
+			case "spiral":
+				return 2;
+				break;
+			case "circle":
+				return 2;
+				break;
+		}
 	}
 	getName() {
 		switch (this.type) {
@@ -363,12 +404,15 @@ class symmetry {
 			case "identity":
 				return this.level + ":I";
 				break;
-				case "glide":
-					return this.level + ":lt";
-					break;
-				case "spiral":
-					return this.level + ":rs";
-					break;
+			case "glide":
+				return this.level + ":lt";
+				break;
+			case "spiral":
+				return this.level + ":rs";
+				break;
+			case "circle":
+				return "circ";
+				break;
 		}
 	}
 	distSqTo(x, y) {
@@ -482,6 +526,14 @@ class symmetry {
 					}
 				}
 				break;
+			case "circle":
+				var r2 = (this.point2[0]-this.point1[0])**2 + (this.point2[1]-this.point1[1])**2;
+				var dx = x - this.point1[0];
+				var dy = y - this.point1[1];
+				var p2 = dx**2 + dy**2;
+				newXs = [this.point1[0] + dx*r2/p2];
+				newYs = [this.point1[1] + dy*r2/p2];
+				break;
 			default:
 				console.log("error, invalid symmetry type");
 				newXs = [];
@@ -557,7 +609,7 @@ function initializeSymmetryList(otherSymmetries) {
 	}
 	var symmetryList = [
 		//	new symmetry("point", 1, [950, 400]),
-		new symmetry("identity", 0, null, null, 0),
+		new symmetry("identity", Number.NEGATIVE_INFINITY, null, null, 0),
 		//	new symmetry("point", 2, [700, 400]),
 		//	new symmetry("line", 1, [0, 200], [100, 210]),
 		//	new symmetry("line", 1, [0, 300], [100, 250]),
@@ -565,6 +617,89 @@ function initializeSymmetryList(otherSymmetries) {
 		//	new symmetry("rotation", 1, [600, 200], false, 4)
 	];
 	return symmetryList.concat(otherSymmetries);
+}
+
+function randint(k0, k1) {
+	if (k1 == undefined) {
+		k1 = Math.floor(k0);
+		k0 = 0;
+	} else {
+		k0 = Math.floor(k0);
+		k1 = Math.floor(k1);
+	}
+	[k0, k1] = [k0, k1].sort();
+	return Math.floor(Math.random()*(k1-k0)) + k0;
+}
+
+function randints(k0, k1, N) {
+	if (N == undefined) {
+		N = 1;
+	}
+	var r = [];
+	for (let k = 0; k < N; k++) {
+		r[k] = randint(k0, k1);
+	}
+	return r;
+}
+
+function randFloat(vMin, vMax) {
+	if (vMax == undefined) {
+		vMax = vMin;
+		vMin = 0;
+	}
+	return Math.random()*(vMax-vMin) + vMin;
+}
+
+function randchoose(a) {
+	// Return a random element of an array
+	return a[randint(a.length)];
+}
+
+function randchoices(a, N) {
+	var r = [];
+	for (let k = 0; k < N; k++) {
+		r[k] = randchoose(a);
+	}
+	return r;
+}
+
+function generateRandomSymmetryList(snapToGrid) {
+	clearSymmetries();
+	var N = randint(1, 5);
+	var xLim = [drawCanvas.width/2 - 100, drawCanvas.width/2 + 100];
+	var yLim = [drawCanvas.height/2 - 100, drawCanvas.height/2 + 100];
+	var oLim = [2, 12];
+	var type, point1, point2, x, y, order, level;
+	for (let k = 0; k < N; k++) {
+		type = randchoose(symmetry.types);
+		while (type == "identity") {
+			// No identity please
+			type = randchoose(symmetry.types);
+		}
+		console.log('type: ', type);
+		order = randint(...oLim);
+		level = k;
+		x = randints(...xLim, 2);
+		y = randints(...yLim, 2);
+		point1 = [x[0], y[0]];
+		if (gridSnap) {
+			point1 = snap(...point1);
+		}
+		if (type == "scale" || type == "spiral") {
+			let angle = randFloat(2*Math.PI);
+			let radius = randFloat(scaleBaseRadius*0.3, scaleBaseRadius*1.3);
+			let dx = radius * Math.cos(angle);
+			let dy = radius * Math.sin(angle);
+			point2 = [point1[0]+dx, point1[1]+dy];
+		} else {
+			point2 = [x[1], y[1]];
+			if (gridSnap) {
+				point2 = snap(...point2);
+
+			}
+		}
+		addSymmetry(new symmetry(type, level, point1, point2, order));
+	}
 }
 
 function toggleSymmetryVisibility() {
@@ -1022,7 +1157,7 @@ function clickHandler(evt, touchType) {
 	if (mode == "editSymmetries") {
 		if (hoverSymmetryIndex == null || (!evt.ctrlKey && !evt.altKey)) {   // Not clicking on an existing symmetry
 			if (temporarySymmetry != undefined) {    // Temporary symmetry exists
-				if (temporarySymmetry.type == "line" || temporarySymmetry.type == "translation" || temporarySymmetry.type == "scale" || temporarySymmetry.type == "glide" || temporarySymmetry.type == "spiral") {
+				if (temporarySymmetry.getNumPoints() == 2) {
 					if (temporarySymmetry.point2 == null) {
 						// Fix first point, begin modifying second point
 						temporarySymmetry.point2 = getCanvasCoords(evt);
@@ -1040,7 +1175,7 @@ function clickHandler(evt, touchType) {
 					// Beginning screen touch with no temporary symmetry? Create it now.
 					let touchCoords = getCanvasCoords(evt, true);
 					temporarySymmetry = createSpecifiedSymmetry(touchCoords, touchCoords.slice());
-					if (temporarySymmetry.type != "line" && temporarySymmetry.type != "translation" && temporarySymmetry.type != "scale" && temporarySymmetry.type != "glide"  || temporarySymmetry.type != "spiral") {
+					if (temporarySymmetry.getNumPoints() < 2) {
 						addSymmetry(temporarySymmetry)
 						temporarySymmetry = undefined;
 					}
@@ -1052,9 +1187,15 @@ function clickHandler(evt, touchType) {
 			// Control button was pressed
 			temporarySymmetry = removeSymmetry(hoverSymmetryIndex);
 			// Make sure we're starting by editing the correct point
-			if (temporarySymmetry.type == "scale" || temporarySymmetry.type == "spiral") {
-				// For scale symmetries, it makes more sense to pick up the primary point and leave the secondary point undefined.
-				temporarySymmetry.point2 = undefined;
+			if (temporarySymmetry.type == "scale" || temporarySymmetry.type == "spiral" || temporarySymmetry.type == "circle") {
+				// For scale, spiral, and circle symmetries, it makes more sense to pick up the primary point and leave the secondary point undefined.
+				if (hoverSymmetryPointIndex == 0) {
+					// Clicked on point1
+					temporarySymmetry.point2 = undefined;
+				} else {
+					// Clicked on point2
+
+				}
 			} else {
 				if (temporarySymmetry.point2 != undefined) {
 					let points = [temporarySymmetry.point1, temporarySymmetry.point2];
@@ -1152,17 +1293,14 @@ function createSpecifiedSymmetry(point1, point2) {
 	var point1 = point1;
 	var point2 = point2;
 	var order;
-	if (type == "rotation") {
-		order = parseInt(getSymmetryOrder());
-	} else if (type == "translation") {
-		order = parseInt(getSymmetryOrder());
-	} else if (type == "scale") {
-		order = parseInt(getSymmetryOrder());
-	} else if (type == "line") {
-	} else if (type == "spiral") {
-		order = parseInt(getSymmetryOrder());
-	} else if (type == "glide") {
-		order = parseInt(getSymmetryOrder());
+	switch (type) {
+		case "rotation":
+		case "translation":
+		case "scale":
+		case "line":
+		case "spiral":
+		case "glide":
+			order = parseInt(getSymmetryOrder());
 	}
 	return new symmetry(type, level, point1, point2, order);
 }
@@ -1315,6 +1453,7 @@ $(function () {
 			// Hide symmetry order for symmetry types that don't have an order
 			switch (type) {
 				case 'line':
+				case 'circle':
 				case 'point':
 					$("#symmetryOrder").css(
 						'visibility',
@@ -1502,7 +1641,7 @@ function drawSpiralSymmetry(sym, color, alpha, verbose) {
 	// drawRotationalSymmetry(sym, color, alpha, verbose);
 	drawScaleSymmetry(sym, color, alpha, verbose);
 	drawCtx.globalAlpha = alpha;
-	drawRadiatingArcs(sym.point1[0], sym.point1[1], sym.order, scaleBaseRadius, [2, 8]);
+	drawRadiatingArcs(sym.point1[0], sym.point1[1], sym.order, scaleBaseRadius, null, [2, 8]);
 	drawCtx.globalAlpha = 1.0;
 }
 function drawGlideSymmetry(sym, color, alpha, verbose) {
@@ -1525,7 +1664,6 @@ function drawGlideSymmetry(sym, color, alpha, verbose) {
 	}
 	drawCtx.globalAlpha = 1.0;
 }
-
 function drawArrowHead(x, y, dx, dy, length, dash, color, lineWidth) {
 	// Draws an arrowhead at (x, y) with sides of the given length pointing in a direction defined by the deltas dx and dy
 	// Convert dx/dy to unit vector
@@ -1550,7 +1688,40 @@ function drawArrowHead(x, y, dx, dy, length, dash, color, lineWidth) {
 	drawCtx.lineTo(x + dxR, y + dyR);
 	drawCtx.stroke();
 }
+function drawCircleSymmetry(sym, color, alpha, verbose) {
+	let point1 = sym.point1;
+	let point2 = sym.point2;
+	if (point2 == null) {
+		point2 = getTempPoint2(point1);
+	}
 
+	drawCtx.globalAlpha = alpha;
+	drawCtx.linewidth = 1;
+	drawCtx.strokeStyle = color;
+
+	// Draw center of circle
+	drawRadiatingArcs(point1[0], point1[1], 12, 0, 6, []);
+
+	// Draw circumference
+	drawCtx.beginPath();
+	drawCtx.setLineDash([2, 8]);
+	let radius = Math.sqrt((point2[0]-point1[0])**2 + (point2[1]-point1[1])**2);
+	drawCtx.arc(point1[0], point1[1], radius, 0, 2*Math.PI);
+	drawCtx.stroke()
+
+	// Draw control point
+	let dx = point2[0] - point1[0];
+	let dy = point2[1] - point1[1];
+	let lineWidth = 1;
+	drawArrowHead(point2[0], point2[1], dx, dy, 9, [], color, lineWidth);
+	drawArrowHead(point2[0], point2[1], -dx, -dy, 9, [], color, lineWidth);
+
+
+	if (verbose) {
+
+	}
+	drawCtx.globalAlpha = 1.0;
+}
 function drawRotationalSymmetry(sym, color, alpha, verbose) {
 	drawCtx.globalAlpha = alpha;
 	drawCtx.linewidth = 1;
@@ -1563,7 +1734,7 @@ function drawRotationalSymmetry(sym, color, alpha, verbose) {
 	drawCtx.stroke()
 
 	// Draw radiating arms
-	drawRadiatingArcs(sym.point1[0], sym.point1[1], sym.order, 0, [2, 8]);
+	drawRadiatingArcs(sym.point1[0], sym.point1[1], sym.order, 0, null, [2, 8]);
 	if (verbose) {
 		// drawCtx.fillStyle = 'black';
 		// drawCtx.fillText(Math.round(sym.point1[0])+','+Math.round(sym.point1[1]), sym.point1[0]+rotationControlPointRadius, sym.point1[1]-rotationControlPointRadius);
@@ -1572,15 +1743,17 @@ function drawRotationalSymmetry(sym, color, alpha, verbose) {
 	drawCtx.globalAlpha = 1.0;
 }
 
-function drawRadiatingArcs(x, y, order, startRadius, dash) {
+function drawRadiatingArcs(x, y, order, startRadius, endRadius, dash) {
+	if (endRadius == null) {
+		endRadius = Math.sqrt(drawCanvas.width**2 + drawCanvas.height**2);
+	}
 	drawCtx.beginPath();
 	drawCtx.setLineDash(dash)
-	var canvasDiag = Math.sqrt(drawCanvas.width**2 + drawCanvas.height**2);
 	var angle;
 	for (var j = 0; j < Math.abs(order); j++) {
 		angle = 2*Math.PI * j / order;
 		drawCtx.moveTo(x + Math.cos(angle)*startRadius, y + Math.sin(angle)*startRadius);
-		drawCtx.lineTo(x + Math.cos(angle)*canvasDiag, y + Math.sin(angle)*canvasDiag);
+		drawCtx.lineTo(x + Math.cos(angle)*endRadius, y + Math.sin(angle)*endRadius);
 	}
 	drawCtx.stroke();
 }
@@ -1830,6 +2003,9 @@ function updateCanvas() {
 					break;
 				case "glide":
 					drawGlideSymmetry(symmetriesToDraw[k], color, alpha, verbose);
+					break;
+				case "circle":
+					drawCircleSymmetry(symmetriesToDraw[k], color, alpha, verbose);
 					break;
 				default:
 					console.log("Error, invalid symmetry type");
