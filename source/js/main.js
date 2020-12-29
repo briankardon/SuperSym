@@ -344,7 +344,9 @@ class symmetry {
 		this.point2 = point2;
 		this.order = order;
 	}
-	static types = ["point", "line", "rotation", "translation", "scale", "spiral", "glide", "identity", "circle"];
+	static getTypes() {
+		return ["point", "line", "rotation", "translation", "scale", "spiral", "glide", "identity", "circle"];
+	}
 	static fromObject(obj) {
 		// Convert a generic deserialized symmetry object into a symmetry object
 		return new symmetry(obj.type, obj.level, obj.point1, obj.point2, obj.order);
@@ -685,10 +687,10 @@ function generateRandomSymmetryList(snapToGrid) {
 	var oLim = [2, 12];
 	var type, point1, point2, x, y, order, level;
 	for (let k = 0; k < N; k++) {
-		type = randchoose(symmetry.types);
+		type = randchoose(symmetry.getTypes());
 		while (type == "identity") {
 			// No identity please
-			type = randchoose(symmetry.types);
+			type = randchoose(symmetry.getTypes());
 		}
 		order = randint(...oLim);
 		level = k;
