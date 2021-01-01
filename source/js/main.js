@@ -58,7 +58,9 @@ $(document).keyup(function(e) {
 			setSymmetryType("point")
 			break;
 		case 'R':
-			generateRandomSymmetryList(gridSnap);
+			if (!e.ctrlKey && !e.altKey && !e.metaKey) {
+				generateRandomSymmetryList(gridSnap);
+			}
 			break;
 		case 'r':
 			setSymmetryType("rotation")
