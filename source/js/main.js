@@ -51,6 +51,9 @@ $(document).keyup(function(e) {
 			$("#editSymmetries").prop("checked", true);
 			updateCanvas();
 			break;
+		case 'E':
+			exportImage();
+			break;
 		case 'p':
 			setSymmetryType("point")
 			break;
@@ -80,6 +83,9 @@ $(document).keyup(function(e) {
 			break;
 		case '?':
 			openShortcutKeyDialog();
+			break;
+		case 'S':
+			smooth(true);
 			break;
 		case 'z':
 			if (e.metaKey || e.ctrlKey) {
@@ -610,6 +616,7 @@ var redoStack = [];
 var undoStackLength = 10;  // maximum number of undo's
 var currentState = packState();
 
+// var autoSmooth; // Running record of latest user entered autoSmooth state
 var gridSnap;  // Running record of latest user entered grid snap state
 var gridSizeX;  // Running record of latest user entered grid size.
 var gridSizeY;
@@ -993,6 +1000,9 @@ function endSegment(evt) {
 		traceY[k].push(NaN);
 		traceC[k].push(NaN);
 	}
+	// if (autoSmooth) {
+	// 	smooth();
+	// }
 	saveState();
 	return false;
 }
@@ -1007,6 +1017,98 @@ function rejoinSegment() {
 			traceC[k].pop(traceC[k].length-1);
 		}
 	}
+}
+
+function smoothTrace(xs, ys) {
+	if (xs.length < 3) {
+		return [xs, ys];
+	}
+	// Pin starting point in place
+	let newXs = [xs[0]];
+	let newYs = [ys[0]];
+	let weights = [1, 4, 1];
+	let weight = weights.reduce((w0, w1) => w0+w1);
+	let wx = Math.floor(weights.length/2);
+	let jj;
+	for (let k = 1; k < xs.length-1; k++) {
+		let xsum = 0;
+		let ysum = 0;
+		let wsum = 0;
+		for (let j = 0; j < weights.length; j++) {
+			jj = k + j - wx;
+			if (jj >= 0 && jj < xs.length) {
+				xsum += weights[j]*xs[jj];
+				ysum += weights[j]*ys[jj];
+				wsum += weights[j];
+			}
+		}
+		newXs[k] = xsum/wsum;
+		newYs[k] = ysum/wsum;
+	}
+	if (xs.length > 1) {
+		// Pin ending point in place
+		newXs.push(xs[xs.length-1]);
+		newYs.push(ys[ys.length-1]);
+	}
+	return [newXs, newYs];
+}
+
+
+function smoothTraces(xs, ys) {
+	// Smooth traces respecting NaN as boundaries between segments
+	var newXs = [];
+	var newYs = [];
+	var k0 = 0;
+	let smoothedXs, smoothedYs;
+
+	// Indices of NaN values in xs or ys
+	var kNaN = [];
+
+	for (let k = 0; k < xs.length; k++) {
+		if (isNaN(xs[k])) {
+			kNaN.push(k);
+		}
+	}
+	kNaN.push(xs.length);
+
+	for (let j = 0; j < kNaN.length; j++) {
+		[smoothedXs, smoothedYs] = smoothTrace(xs.slice(k0, kNaN[j]), ys.slice(k0, kNaN[j]));
+		newXs = newXs.concat(smoothedXs);
+		newYs = newYs.concat(smoothedYs);
+		if (kNaN[j] == xs.length) {
+			return [newXs, newYs];
+		}
+		newXs.push(NaN);
+		newYs.push(NaN);
+		k0 = kNaN[j]+1;
+	}
+}
+
+function smooth(preSave) {
+	if (preSave) {
+		saveState();
+	}
+	console.log('smoothing');
+	recalculateSymmetries();
+	for (let k = 0; k < traceX.length; k++) {
+		[traceX[k], traceY[k]] = smoothTraces(traceX[k], traceY[k]);
+	}
+	updateCanvas();
+	console.log('done smoothing');
+}
+
+function copy(obj) {
+	return JSON.parse(JSON.stringify(obj));
+}
+
+function exportImage() {
+	console.log('exporting');
+
+	// e.g This will open an image in a new window
+	let url = drawCanvas.toDataURL();
+	let win = window.open();
+	win.document.write('<iframe src="' + url  + '" frameborder="0" style="border:0; top:0px; left:0px; bottom:0px; right:0px; width:100%; height:100%;" allowfullscreen></iframe>');
+
 }
 
 function snap(x, y) {
@@ -1400,6 +1502,9 @@ $(function () {
 	drawCanvas = document.getElementById("drawCanvas");
 	drawCtx = drawCanvas.getContext('2d');
 
+	// $("#autoSmooth").on('change', function () {
+	// 	autoSmooth = $("#autoSmooth").prop('checked');
+	// });
 	$("#gridSnap").on('change', function () {
 		gridSnap = $("#gridSnap").prop('checked');
 	})
@@ -1410,6 +1515,7 @@ $(function () {
 		gridType = $("#gridType").val();
 		updateGridSize($("#gridSize").val())
 	});
+	// $("#autoSmooth").trigger('change');
 	$("#gridType").trigger('change');
 	$("#gridSnap").trigger('change');
 	$("#gridSize").trigger('change');
@@ -1523,6 +1629,13 @@ $(function () {
 			}
 		}
 	);
+
+	$("#smooth").on('click', function () {
+		smooth(true);
+	});
+	$("#export").on('click', function () {
+		exportImage();
+	});
 
 	$("#drawCanvas").on('click', clickHandler);
 	$("#drawCanvas").on('touchstart', touchstartHandler);
