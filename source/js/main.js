@@ -12,7 +12,7 @@ $(document).keydown(function(e) {
 			break;
 		case 'z':
 			if (e.metaKey || e.ctrlKey || e.shiftKey) {
-				e.preventDefault()
+				e.preventDefault();
 			}
 			break;
 	}
@@ -92,13 +92,13 @@ $(document).keyup(function(e) {
 		case 'z':
 			if (e.metaKey || e.ctrlKey) {
 				undo();
-				e.preventDefault()
+				e.preventDefault();
 			}
 			break;
 		case 'Z':
 			if (e.metaKey || e.ctrlKey) {
 				redo();
-				e.preventDefault()
+				e.preventDefault();
 			}
 			break;
 		case 'Shift':
@@ -187,7 +187,7 @@ function setUpModal() {
 
 function DocumentKeyPressHandler(e) {
 	// Thanks to: https://stackoverflow.com/a/16006607/1460057
-	var evtobj = window.event? event : e
+	var evtobj = window.event? event : e;
 	if (evtobj.keyCode == 90 && evtobj.ctrlKey) {
 
 	}
@@ -516,7 +516,7 @@ class symmetry {
 				break;
 			case "scale":
 				if (this.point2 != null && this.point1 != null) {
-					var scaleFactor = Math.sqrt((this.point2[0]-this.point1[0])**2 + (this.point2[1]-this.point1[1])**2)/scaleBaseRadius
+					var scaleFactor = Math.sqrt((this.point2[0]-this.point1[0])**2 + (this.point2[1]-this.point1[1])**2)/scaleBaseRadius;
 					let dx = x - this.point1[0];
 					let dy = y - this.point1[1];
 					for (let t = 0; t < this.order; t++) {
@@ -537,7 +537,7 @@ class symmetry {
 			case "spiral":
 				if (this.point2 != null && this.point1 != null) {
 					var angle = 2*Math.PI / this.order;
-					var scaleFactor = Math.sqrt((this.point2[0]-this.point1[0])**2 + (this.point2[1]-this.point1[1])**2)/scaleBaseRadius
+					var scaleFactor = Math.sqrt((this.point2[0]-this.point1[0])**2 + (this.point2[1]-this.point1[1])**2)/scaleBaseRadius;
 					let order = Math.abs(this.order);
 					for (let s = 0; s < order; s++) {
 						[newX, newY] = rotate(x, y, this.point1[0], this.point1[1], angle*(s+1));
@@ -754,7 +754,7 @@ function setMode(newMode) {
 
 function updateMode() {
 	var newMode = $('input[name="Mode"]:checked').val();
-	setMode(newMode)
+	setMode(newMode);
 	updateCanvas();
 }
 
@@ -844,7 +844,7 @@ function addPoint(x, y, c, includeTemporarySymmetry) {
 		}
 		traceX[k] = traceX[k].concat(symXs[k]);
 		traceY[k] = traceY[k].concat(symYs[k]);
-		traceC[k] = traceC[k].concat(c)
+		traceC[k] = traceC[k].concat(c);
 	}
 }
 
@@ -856,9 +856,9 @@ function restartFromLast() {
 	for (var k = traceX[0].length-1; k >= 0; k--) {
 		if (!isNaN(traceX[0][k])) {
 			// Found last point of last trajectory - copy it to the beginning of the new trajectory.
-			traceX = [traceX[0].concat([traceX[0][k]])]
-			traceY = [traceY[0].concat([traceY[0][k]])]
-			traceC = [traceC[0].concat([traceC[0][k]])]
+			traceX = [traceX[0].concat([traceX[0][k]])];
+			traceY = [traceY[0].concat([traceY[0][k]])];
+			traceC = [traceC[0].concat([traceC[0][k]])];
 			recalculateSymmetries();
 			break;
 		}
@@ -923,7 +923,7 @@ function saveState() {
 	currentState = packState();
 
 	// Clear redo state
-	clearRedoStack()
+	clearRedoStack();
 }
 
 function clearRedoStack() {
@@ -1192,7 +1192,6 @@ function updateColorHistory() {
 		nextHistoryNum = nextHistoryNum + 1;
 	}
 	if ($("#colorTools").find("button.colorHistory").length > maxColorHistorySize) {
-		$("#colorTools").find("button.colorHistory")
 		historyNums = $("#colorTools").find("button.colorHistory").map(function (k, button) {
 			return $(button).text();
 		}).get();
@@ -1224,7 +1223,7 @@ function addColorHistoryButton(color, num) {
 		let contrastRGB = getContrastingRGBColor(rgbColor);
 		$(colorHistoryButton).css('color', rgbToHex(contrastRGB));
 	} catch(err) {
-		console.log('Error - cannot create history buttons.')
+		console.log('Error - cannot create history buttons.');
 		$(colorHistoryButton).remove();
 	}
 }
@@ -1300,11 +1299,11 @@ function clickHandler(evt, touchType) {
 						temporarySymmetry.point2 = getCanvasCoords(evt);
 					} else {
 						// Fix second point, add symmetry
-						addSymmetry(temporarySymmetry)
+						addSymmetry(temporarySymmetry);
 						temporarySymmetry = undefined;
 					}
 				} else {
-					addSymmetry(temporarySymmetry)
+					addSymmetry(temporarySymmetry);
 					temporarySymmetry = undefined;
 				}
 			} else {    // Temporary symmetry does not already exist
@@ -1313,7 +1312,7 @@ function clickHandler(evt, touchType) {
 					let touchCoords = getCanvasCoords(evt, true);
 					temporarySymmetry = createSpecifiedSymmetry(touchCoords, touchCoords.slice());
 					if (temporarySymmetry.getNumPoints() < 2) {
-						addSymmetry(temporarySymmetry)
+						addSymmetry(temporarySymmetry);
 						temporarySymmetry = undefined;
 					}
 				} else {
@@ -1352,7 +1351,7 @@ function clickHandler(evt, touchType) {
 	} else if (mode == "fill") {
 		var [x, y] = getCanvasCoords(evt);
 		var color = getSelectedLineColor();
-		floodFill(x, y, color)
+		floodFill(x, y, color);
 		//				var [symXs, symYs] = applySymmetries(x, y, 0);
 		//				for (var k = 0; k < symXs.length; k++) {
 		//					floodFill(symXs[k], symYs[k], color);
@@ -1510,13 +1509,13 @@ $(function () {
 	// });
 	$("#gridSnap").on('change', function () {
 		gridSnap = $("#gridSnap").prop('checked');
-	})
+	});
 	$("#gridSize").on('change', function () {
 		updateGridSize($("#gridSize").val());
 	});
 	$("#gridType").on('change', function() {
 		gridType = $("#gridType").val();
-		updateGridSize($("#gridSize").val())
+		updateGridSize($("#gridSize").val());
 	});
 	// $("#autoSmooth").trigger('change');
 	$("#gridType").trigger('change');
@@ -1651,8 +1650,8 @@ $(function () {
 	$("#drawCanvas").on('touchend', touchendHandler);
 	$("#drawCanvas").on('mousemove', mousemoveHandler);
 	$("#drawCanvas").on('touchmove', touchmoveHandler);
-	$("#symmetryTransparency").on('change', updateCanvas)
-	$("#drawTransparency").on('change', updateCanvas)
+	$("#symmetryTransparency").on('change', updateCanvas);
+	$("#drawTransparency").on('change', updateCanvas);
 
 	// Set version number
 	var version = '1.22.1';
@@ -1807,7 +1806,7 @@ function drawGlideSymmetry(sym, color, alpha, verbose) {
 	drawFullLine(point1[0], point1[1], point2[0], point2[1], color, dash, lineWidth);
 	// Draw control points
 	drawCtx.beginPath();
-	drawCtx.setLineDash([])
+	drawCtx.setLineDash([]);
 	drawArrowHead(point1[0], point1[1], point2[0]-point1[0], point2[1]-point1[1], 9, [], color, lineWidth);
 	drawArrowHead(point2[0], point2[1], point2[0]-point1[0], point2[1]-point1[1], 9, [], color, lineWidth);
 	if (verbose) {
@@ -1858,7 +1857,7 @@ function drawCircleSymmetry(sym, color, alpha, verbose) {
 	drawCtx.setLineDash([2, 8]);
 	let radius = Math.sqrt((point2[0]-point1[0])**2 + (point2[1]-point1[1])**2);
 	drawCtx.arc(point1[0], point1[1], radius, 0, 2*Math.PI);
-	drawCtx.stroke()
+	drawCtx.stroke();
 
 	// Draw control point
 	let dx = point2[0] - point1[0];
@@ -1882,7 +1881,7 @@ function drawRotationalSymmetry(sym, color, alpha, verbose) {
 	// Draw center of rotation
 	drawCtx.beginPath();
 	drawCtx.arc(sym.point1[0], sym.point1[1], rotationControlPointRadius, 0, 2*Math.PI);
-	drawCtx.stroke()
+	drawCtx.stroke();
 
 	// Draw radiating arms
 	drawRadiatingArcs(sym.point1[0], sym.point1[1], sym.order, 0, null, [2, 8]);
@@ -1899,7 +1898,7 @@ function drawRadiatingArcs(x, y, order, startRadius, endRadius, dash) {
 		endRadius = Math.sqrt(drawCanvas.width**2 + drawCanvas.height**2);
 	}
 	drawCtx.beginPath();
-	drawCtx.setLineDash(dash)
+	drawCtx.setLineDash(dash);
 	var angle;
 	for (var j = 0; j < Math.abs(order); j++) {
 		angle = 2*Math.PI * j / order;
@@ -1931,7 +1930,7 @@ function drawLineSymmetry(sym, color, alpha, verbose) {
 	drawFullLine(point1[0], point1[1], point2[0], point2[1], color, dash, lineWidth);
 	// Draw control points
 	drawCtx.beginPath();
-	drawCtx.setLineDash([])
+	drawCtx.setLineDash([]);
 	drawCtx.rect(point1[0]-3, point1[1]-3, lineControlPointWidth, lineControlPointWidth);
 	drawCtx.rect(point2[0]-3, point2[1]-3, lineControlPointWidth, lineControlPointWidth);
 	drawCtx.stroke();
@@ -1958,7 +1957,7 @@ function drawFullLine(x1, y1, x2, y2, color, dash, lineWidth) {
 	dy = scale * dy;
 	drawCtx.linewidth = lineWidth;
 	drawCtx.strokeStyle = color;
-	drawCtx.setLineDash(dash)
+	drawCtx.setLineDash(dash);
 	drawCtx.beginPath();
 	drawCtx.moveTo(x1-dx, y1-dy);
 	drawCtx.lineTo(x1+dx, y1+dy);
@@ -1981,7 +1980,7 @@ function drawTranslationalSymmetry(sym, color, alpha, verbose) {
 	drawCtx.stroke();
 	// Draw control points
 	drawCtx.beginPath();
-	drawCtx.setLineDash([])
+	drawCtx.setLineDash([]);
 	let points = [point1, point2];
 	for (var j = 0; j < 2; j++) {
 		drawCtx.moveTo(points[j][0]+transControlPointX[0], points[j][1]+transControlPointY[0]);
@@ -2019,11 +2018,11 @@ function drawScaleSymmetry(sym, color, alpha, verbose) {
 
 	// Draw center X control point
 	drawCtx.beginPath();
-	drawCtx.moveTo(point1[0]-rotationControlPointRadius, point1[1]-rotationControlPointRadius)
-	drawCtx.lineTo(point1[0]+rotationControlPointRadius, point1[1]+rotationControlPointRadius)
-	drawCtx.moveTo(point1[0]-rotationControlPointRadius, point1[1]+rotationControlPointRadius)
-	drawCtx.lineTo(point1[0]+rotationControlPointRadius, point1[1]-rotationControlPointRadius)
-	drawCtx.stroke()
+	drawCtx.moveTo(point1[0]-rotationControlPointRadius, point1[1]-rotationControlPointRadius);
+	drawCtx.lineTo(point1[0]+rotationControlPointRadius, point1[1]+rotationControlPointRadius);
+	drawCtx.moveTo(point1[0]-rotationControlPointRadius, point1[1]+rotationControlPointRadius);
+	drawCtx.lineTo(point1[0]+rotationControlPointRadius, point1[1]-rotationControlPointRadius);
+	drawCtx.stroke();
 
 	drawCtx.beginPath();
 	drawCtx.arc(point1[0], point1[1], scaleBaseRadius, 0, 2*Math.PI);
@@ -2046,7 +2045,7 @@ function drawScaleSymmetry(sym, color, alpha, verbose) {
 
 	// Draw connecting line
 	drawCtx.beginPath();
-	drawCtx.setLineDash([4, 4])
+	drawCtx.setLineDash([4, 4]);
 	drawCtx.moveTo(point2[0], point2[1]);
 	drawCtx.lineTo(point1[0] + dx1*scaleRadius, point1[1] + dy1*scaleRadius);
 	drawCtx.stroke();
@@ -2121,7 +2120,7 @@ function updateCanvas() {
 			color = symmetryColor;
 			let verbose = false;
 			if (k == hoverSymmetryIndex) {
-				color = hoverSymmetryColor
+				color = hoverSymmetryColor;
 				verbose = true;
 				alpha = 1;
 			} else if (symmetriesToDraw[k] === temporarySymmetry) {
