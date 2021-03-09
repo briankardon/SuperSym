@@ -2165,3 +2165,45 @@ function updateCanvas() {
 		drawCtx.globalAlpha = 1.0;
 	}
 }
+
+function convertToSVG() {
+	let width = 0;
+	let height = 0;
+	svgStart = `<?xml version="1.0" encoding="UTF-8"?>
+		<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+		<!-- Creator: supersym.briankardon.net -->
+		<svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="24in" height="12in" version="1.1" style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd"
+		viewBox="0 0 ${width} ${height}"
+		 xmlns:xlink="http://www.w3.org/1999/xlink">`;
+
+	svgGroupStart = '  <g>\n';
+	svgGroupEnd = '  </g>\n';
+	svgEnd = '</svg>';
+
+	svgText = svgStart;
+	svgText = svgText + svgGroupStart;
+	let svgPointList = [];
+	let svgPoints = '';
+	let x, y, c, oldC = NaN;
+	for (var k = 0; k < traceX.length; k++) {
+		for (var j = 0; j < traceX[k].length; j++) {
+			x = traceX[k][j];
+			y = traceY[k][j];
+			c = traceC[k][j];
+			if ((c != oldC || isNaN(x)) && svgPointList.length > 0) {
+				svgPoints = svgPointList.join(', ');
+				svgLine = `    <polyline points="${svgPoints}" style="stroke:${oldC}; stroke-width:3; stroke-miterlimit:2.61313; fill:none" />\n`;
+				svgText = svgText + svgLine;
+				svgPointList = [];
+				svgPoints = '';
+			}
+			if (!isNaN(x)) {
+				svgPointList.push(`${x.toFixed(2)} ${y.toFixed(2)}`);
+			}
+			oldC = c;
+		}
+	}
+	svgText = svgText + svgGroupEnd;
+	svgText = svgText + svgEnd;
+	console.log(svgText);
+}
