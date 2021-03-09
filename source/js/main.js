@@ -1370,14 +1370,13 @@ function mousemoveHandler(evt, isTouch) {
 		firstCanvasWidthUpdate = false;
 	}
 	var [x, y] = getCanvasCoords(evt, isTouch);
-	// var dm = (Math.sqrt((x-lastMouseX)**2+(y-lastMouseY)**2));
-	lastMouseX = x;
-	lastMouseY = y;
 	if (mode == "draw") {
 		if (evt.buttons == 1 || isTouch) {
-			var c = getSelectedLineColor();
-			addPoint(x, y, c);
-			updateCanvas();
+			if (x != lastMouseX || y != lastMouseY) {
+				var c = getSelectedLineColor();
+				addPoint(x, y, c);
+				updateCanvas();
+			}
 		}
 	} else if (mode == "editSymmetries") {
 		var canvasUpdateNeeded = false;
@@ -1420,6 +1419,8 @@ function mousemoveHandler(evt, isTouch) {
 			recalculateSymmetries(true);
 		}
 	}
+	lastMouseX = x;
+	lastMouseY = y;
 	return false;
 }
 
