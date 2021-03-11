@@ -52,7 +52,11 @@ $(document).keyup(function(e) {
 			updateCanvas();
 			break;
 		case 'E':
-			exportImage();
+			if (e.ctrlKey) {
+				exportSVGImage();
+			} else {
+				exportPNGImage();
+			}
 			break;
 		case 'p':
 			setSymmetryType("point")
@@ -1103,14 +1107,24 @@ function copy(obj) {
 	return JSON.parse(JSON.stringify(obj));
 }
 
-function exportImage() {
-	console.log('exporting');
-
-	// e.g This will open an image in a new window
+function exportPNGImage() {
+	console.log('exportingPNG');
 	let url = drawCanvas.toDataURL();
-	let win = window.open();
-	win.document.write('<iframe src="' + url  + '" frameborder="0" style="border:0; top:0px; left:0px; bottom:0px; right:0px; width:100%; height:100%;" allowfullscreen></iframe>');
+	$("#exportPNGDialog").html('<a download href="'+url+'">Click here to download as PNG image</a>');
+	$("#exportPNGDialog").dialog("open");
+	// e.g This will open an image in a new window
+	// let win = window.open();
+	// win.document.write('<iframe src="' + url  + '" frameborder="0" style="border:0; top:0px; left:0px; bottom:0px; right:0px; width:100%; height:100%;" allowfullscreen></iframe>');
+}
 
+function exportSVGImage() {
+	console.log('exportingSVG');
+	let url = 'data:image/svg+xml;utf8,'+convertToSVG();
+	$("#exportSVGDialog").html('<a download href=\''+url+'\'>Click here to download as SVG image</a>');
+	$("#exportSVGDialog").dialog("open");
+	// e.g This will open an image in a new window
+	// let win = window.open();
+	// win.document.write('<iframe src="' + url  + '" frameborder="0" style="border:0; top:0px; left:0px; bottom:0px; right:0px; width:100%; height:100%;" allowfullscreen></iframe>');
 }
 
 function snap(x, y) {
@@ -1550,8 +1564,14 @@ $(function () {
 	// Set up canvas resize handler
 	window.onresize = updateCanvasSize;
 
-	// Set up export dialog
+	// Set up export dialogs
 	$( "#exportDialog" ).dialog({
+		autoOpen: false
+	});
+	$( "#exportPNGDialog" ).dialog({
+		autoOpen: false
+	});
+	$( "#exportSVGDialog" ).dialog({
 		autoOpen: false
 	});
 	$("#shortcutKeyDialog").dialog({
@@ -1636,8 +1656,11 @@ $(function () {
 	$("#smooth").on('click', function () {
 		smooth(true);
 	});
-	$("#export").on('click', function () {
-		exportImage();
+	$("#exportPNG").on('click', function () {
+		exportPNGImage();
+	});
+	$("#exportSVG").on('click', function () {
+		exportSVGImage();
 	});
 
 	$("#drawCanvas").on('click', clickHandler);
@@ -1655,7 +1678,7 @@ $(function () {
 	$("#drawTransparency").on('change', updateCanvas);
 
 	// Set version number
-	var version = '1.22.1';
+	var version = '1.23';
 	$("#footer").html($('#footer').html()+version);
 
 	setModeIndicator("draw");
@@ -2169,10 +2192,10 @@ function updateCanvas() {
 function convertToSVG() {
 	let width = 0;
 	let height = 0;
-	svgStart = `<?xml version="1.0" encoding="UTF-8"?>
-		<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-		<!-- Creator: supersym.briankardon.net -->
-		<svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="24in" height="12in" version="1.1" style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd"
+	// svgStart = `<?xml version="1.0" encoding="UTF-8"?>
+	// 	<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+	// 	<!-- Creator: supersym.briankardon.net -->
+		svgStart = `<svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="24in" height="12in" version="1.1" style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd"
 		viewBox="0 0 ${width} ${height}"
 		 xmlns:xlink="http://www.w3.org/1999/xlink">`;
 
@@ -2205,5 +2228,7 @@ function convertToSVG() {
 	}
 	svgText = svgText + svgGroupEnd;
 	svgText = svgText + svgEnd;
-	console.log(svgText);
+	return encodeURIComponent(svgText);
+	// var w = window.open("export.svg");
+  // w.document.write(svgText.replace(/\</g, '&lt;').replace(/\>/g, '&gt;'));
 }

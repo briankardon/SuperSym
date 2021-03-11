@@ -6,7 +6,7 @@
 	<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css">
 	<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
   <script src='js/spectrum.js'></script>
-	<script id="mainjs" src="js/main.js?1.22.1"></script>
+	<script id="mainjs" src="js/main.js?1.23"></script>
 	<link href='https://fonts.googleapis.com/css?family=Raleway:400,300,600' rel='stylesheet' type='text/css'>
 	<link rel="stylesheet" href="css/normalize.css">
   <link rel="stylesheet" href="css/skeleton.css">
@@ -146,7 +146,8 @@
 		<fieldset class="toolBarElement">
 			<label for="" class="toolBarSubElementHeader">Output</label>
 			<div><button class="toolBarSubElement" title="hotkey: shift-S" id="smooth">Smooth</button></div>
-			<div><button class="toolBarSubElement" title="hotkey: shift-E" id="export">Export Img</button></div>
+			<div><button class="toolBarSubElement" title="hotkey: shift-E" id="exportPNG">Export PNG</button></div>
+			<div><button class="toolBarSubElement" title="hotkey: ctrl-shift-E" id="exportSVG">Export SVG</button></div>
 		</fieldset>
 
 		<a class="toolBarElement" id="FAQLink" href="#">FAQ</a>
@@ -244,6 +245,8 @@
 	<h1>SuperSym</h1>
 </div>
 <div id="exportDialog" hidden="hidden" title="Exported symmetry configuration"></div>
+<div id="exportPNGDialog" hidden="hidden" title="Exported PNG"></div>
+<div id="exportSVGDialog" hidden="hidden" title="Exported SVG"></div>
 <div id="shortcutKeyDialog" hidden="hidden" title="Shortcut keys">
 	<table>
 	  <tr>
