@@ -2192,10 +2192,10 @@ function updateCanvas() {
 function convertToSVG() {
 	let width = 0;
 	let height = 0;
-	// svgStart = `<?xml version="1.0" encoding="UTF-8"?>
-	// 	<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-	// 	<!-- Creator: supersym.briankardon.net -->
-		svgStart = `<svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="24in" height="12in" version="1.1" style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd"
+	svgStart = `<?xml version="1.0" encoding="UTF-8"?>
+		<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+		<!-- Creator: supersym.briankardon.net -->
+		<svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="24in" height="12in" version="1.1" style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd"
 		viewBox="0 0 ${width} ${height}"
 		 xmlns:xlink="http://www.w3.org/1999/xlink">`;
 
