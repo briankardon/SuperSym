@@ -600,6 +600,8 @@ var traceX = [[]];
 var traceY = [[]];
 var traceC = [[]];
 
+var drawHistory = Infinity;
+
 var drawCanvas;
 var drawCtx;
 var showSymmetries = true;
@@ -788,7 +790,6 @@ function removeSymmetry(symmetryIndex) {
 	return removedSymmetry;
 }
 
-
 function addSymmetry(symmetry) {
 	symmetries.push(symmetry);
 	sortSymmetries(symmetries);
@@ -831,6 +832,23 @@ function applySymmetries(xs, ys, remainingSymmetries) {
 	return applySymmetries(xs.concat(symXs), ys.concat(symYs), remainingSymmetries);
 }
 
+function getDrawHistoryLength() {
+	return $("#drawLength").val();
+}
+
+function getDrawHistoryLimited() {
+	return document.getElementById("limitDrawLength").checked;
+}
+
+function updateDrawHistorySettings() {
+	if (getDrawHistoryLimited()) {
+		drawHistory = getDrawHistoryLength();
+	} else {
+		drawHistory = Infinity;
+	}
+	console.log(drawHistory);
+}
+
 function addPoint(x, y, c, includeTemporarySymmetry) {
 	var currentSymmetries;
 	if (includeTemporarySymmetry && temporarySymmetry != undefined) {
@@ -849,6 +867,12 @@ function addPoint(x, y, c, includeTemporarySymmetry) {
 		traceX[k] = traceX[k].concat(symXs[k]);
 		traceY[k] = traceY[k].concat(symYs[k]);
 		traceC[k] = traceC[k].concat(c);
+
+		if (traceX[k].length > drawHistory) {
+			traceX[k].splice(0, traceX[k].length-drawHistory);
+			traceY[k].splice(0, traceY[k].length-drawHistory);
+			traceC[k].splice(0, traceC[k].length-drawHistory);
+		}
 	}
 }
 
@@ -1058,7 +1082,6 @@ function smoothTrace(xs, ys) {
 	}
 	return [newXs, newYs];
 }
-
 
 function smoothTraces(xs, ys) {
 	// Smooth traces respecting NaN as boundaries between segments
@@ -1676,6 +1699,10 @@ $(function () {
 	$("#drawCanvas").on('touchmove', touchmoveHandler);
 	$("#symmetryTransparency").on('change', updateCanvas);
 	$("#drawTransparency").on('change', updateCanvas);
+
+	$("#drawLength").on('change', updateDrawHistorySettings);
+	$("#limitDrawLength").on('change', updateDrawHistorySettings);
+
 
 	// Set version number
 	var version = '1.23';
